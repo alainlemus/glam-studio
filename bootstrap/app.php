@@ -21,6 +21,16 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            \App\Http\Middleware\ShareSiteData::class,
+        ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'api/*',
+            'webhook/*',
+        ]);
+
+        $middleware->alias([
+            'role' => \App\Http\Middleware\EnsureUserRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

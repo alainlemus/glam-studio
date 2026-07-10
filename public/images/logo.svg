@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+    <defs>
+        <linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFFFFF" />
+            <stop offset="30%" stop-color="#F0F0F0" />
+            <stop offset="60%" stop-color="#C0C0C0" />
+            <stop offset="100%" stop-color="#808080" />
+        </linearGradient>
+        <linearGradient id="silverGlitter" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFFFFF" />
+            <stop offset="25%" stop-color="#E8E8E8" />
+            <stop offset="50%" stop-color="#9CA3AF" />
+            <stop offset="75%" stop-color="#D1D5DB" />
+            <stop offset="100%" stop-color="#9CA3AF" />
+        </linearGradient>
+        <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FBBF24" />
+            <stop offset="50%" stop-color="#D4AF37" />
+            <stop offset="100%" stop-color="#A88B2A" />
+        </linearGradient>
+    </defs>
+
+    <!-- Fondo negro sólido -->
+    <rect width="400" height="400" fill="#0A0A0A" />
+
+    <!-- Círculos concéntricos plateados (más visibles con stroke más grueso) -->
+    <circle cx="200" cy="180" r="175" stroke="#D1D5DB" stroke-width="1.5" fill="none" opacity="0.5" />
+    <circle cx="200" cy="180" r="160" stroke="#E8E8E8" stroke-width="1" fill="none" opacity="0.4" />
+
+    <!-- Destellos alrededor (más grandes y visibles) -->
+    <g fill="#FFFFFF">
+        <circle cx="35" cy="100" r="3" />
+        <circle cx="85" cy="55" r="2" />
+        <circle cx="365" cy="65" r="2.5" />
+        <circle cx="370" cy="155" r="2.2" />
+        <circle cx="35" cy="265" r="2.5" />
+        <circle cx="370" cy="290" r="3" />
+        <circle cx="125" cy="335" r="2" />
+        <circle cx="295" cy="340" r="2.2" />
+    </g>
+    <!-- Pequeño destello dorado (acento) -->
+    <g fill="#D4AF37">
+        <circle cx="60" cy="50" r="1.5" />
+        <circle cx="345" cy="250" r="1.5" />
+    </g>
+
+    <!-- Corona dorada sobre AM (más detallada) -->
+    <g transform="translate(135, 50)">
+        <path d="M 6 38 L 18 12 L 30 28 L 42 4 L 54 28 L 66 12 L 78 38 Z"
+              fill="url(#gold)" stroke="#A88B2A" stroke-width="0.8" />
+        <circle cx="18" cy="9" r="2.2" fill="#FBBF24" />
+        <circle cx="42" cy="2" r="2.5" fill="#FBBF24" />
+        <circle cx="66" cy="9" r="2.2" fill="#FBBF24" />
+        <circle cx="30" cy="26" r="1.5" fill="#FBBF24" opacity="0.7" />
+        <circle cx="54" cy="26" r="1.5" fill="#FBBF24" opacity="0.7" />
+        <rect x="6" y="37" width="78" height="3" fill="url(#gold)" stroke="#A88B2A" stroke-width="0.3" rx="1.5" />
+    </g>
+
+    <!-- Letras "AM" plateadas con stroke más grueso -->
+    <g transform="translate(80, 130)" stroke="url(#silver)" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M 50 170 L 110 25 L 170 170 M 75 128 L 145 128" />
+        <path d="M 200 170 L 200 25 L 270 105 L 340 25 L 340 170" />
+    </g>
+
+    <!-- Resplandor sobre letras -->
+    <g fill="#FFFFFF">
+        <circle cx="180" cy="170" r="1.5" opacity="0.9" />
+        <circle cx="225" cy="180" r="2" opacity="0.95" />
+        <circle cx="265" cy="195" r="1.5" opacity="0.9" />
+    </g>
+
+    <!-- Texto "Glam Studio" plateado -->
+    <text x="200" y="330"
+          text-anchor="middle"
+          font-family="'Cormorant Garamond', Georgia, serif"
+          font-style="italic"
+          font-weight="600"
+          font-size="56"
+          fill="url(#silverGlitter)"
+          letter-spacing="1">
+        Glam Studio
+    </text>
+
+    <!-- Destellos bajo el texto -->
+    <g fill="#FFFFFF">
+        <circle cx="115" cy="350" r="1.8" opacity="0.7" />
+        <circle cx="285" cy="350" r="1.8" opacity="0.7" />
+        <circle cx="200" cy="365" r="1.2" opacity="0.6" />
+    </g>
+</svg>
