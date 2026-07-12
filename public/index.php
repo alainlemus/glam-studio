@@ -1,5 +1,10 @@
 <?php
 
+// Silenciar warnings que contaminan el output JSON
+@ini_set('display_errors', '0');
+@ini_set('display_startup_errors', '0');
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE & ~E_DEPRECATED);
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 

@@ -60,14 +60,23 @@ const fetchSlots = async () => {
     }
     loadingSlots.value = true;
     try {
+        // Obtener el token CSRF actualizado de la cookie XSRF-TOKEN
+        // (que Laravel setea automáticamente y rota en cada request)
+        const getCookie = (name: string) => {
+            const match = document.cookie.match(new RegExp('(^|; )' + name + '=([^;]*)'));
+            return match ? decodeURIComponent(match[2]) : '';
+        };
+        const xsrfToken = getCookie('XSRF-TOKEN');
+
         const response = await fetch('/api/slots', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'X-XSRF-TOKEN': xsrfToken,
             },
+            credentials: 'same-origin',
             body: JSON.stringify({
                 branch_id: form.value.branch_id,
                 service_id: form.value.service_id,
@@ -75,11 +84,16 @@ const fetchSlots = async () => {
                 date: form.value.date,
             }),
         });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
         const data = await response.json();
-        slots.value = data.slots;
-        availableStylists.value = data.stylists;
+        slots.value = data.slots || [];
+        availableStylists.value = data.stylists || [];
     } catch (e) {
-        console.error(e);
+        console.error('fetchSlots error:', e);
+        slots.value = [];
+        availableStylists.value = [];
     } finally {
         loadingSlots.value = false;
     }

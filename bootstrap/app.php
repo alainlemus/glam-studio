@@ -1,5 +1,11 @@
 <?php
 
+// Silenciar warnings de PHP que rompen el output JSON
+// (notablemente: file_put_contents broken pipe con el servidor integrado)
+@ini_set('display_errors', '0');
+@ini_set('display_startup_errors', '0');
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE & ~E_DEPRECATED);
+
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;

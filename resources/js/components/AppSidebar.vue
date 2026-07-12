@@ -32,13 +32,12 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
 const operacionNavItems: NavItem[] = [
     {
         title: 'Panel principal',
-        href: dashboard(),
+        href: '/admin',
         icon: LayoutGrid,
     },
     {
@@ -134,7 +133,7 @@ const clientesNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child class="hover:bg-transparent">
-                        <Link :href="dashboard()" class="flex items-center gap-3 p-1 transition-transform hover:scale-[1.02]">
+                        <Link href="/admin" class="flex items-center gap-3 p-1 transition-transform hover:scale-[1.02]">
                             <AppLogo variant="sidebar" />
                         </Link>
                     </SidebarMenuButton>

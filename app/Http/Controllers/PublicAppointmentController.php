@@ -44,6 +44,8 @@ class PublicAppointmentController extends Controller
             'stylist_id' => 'nullable|exists:stylists,id',
             'service_id' => 'required|exists:services,id',
             'date' => 'required|date|after_or_equal:today',
+            // Permitimos la fecha de hoy. El Book.vue valida que
+            // la hora seleccionada sea >= hora actual.
         ]);
 
         $service = Service::findOrFail($validated['service_id']);
