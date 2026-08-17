@@ -48,6 +48,13 @@ class PublicAppointmentController extends Controller
             // la hora seleccionada sea >= hora actual.
         ]);
 
+        // Normalizar start_time: aceptar "H:i" o "H:i:s"
+        $request->merge([
+            'start_time' => preg_match('/^\d{2}:\d{2}$/', $request->input('start_time'))
+                ? $request->input('start_time') . ':00'
+                : $request->input('start_time'),
+        ]);
+
         $service = Service::findOrFail($validated['service_id']);
         $branch = Branch::findOrFail($validated['branch_id']);
         $date = \Carbon\Carbon::parse($validated['date']);
@@ -130,6 +137,12 @@ class PublicAppointmentController extends Controller
 
     public function store(Request $request)
     {
+        // Normalizar start_time ANTES de validar: aceptar "H:i" o "H:i:s"
+        $startTimeRaw = $request->input('start_time');
+        if ($startTimeRaw && preg_match('/^\d{2}:\d{2}$/', $startTimeRaw)) {
+            $request->merge(['start_time' => $startTimeRaw . ':00']);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -138,7 +151,7 @@ class PublicAppointmentController extends Controller
             'service_id' => 'required|exists:services,id',
             'stylist_id' => 'nullable|exists:stylists,id',
             'date' => 'required|date|after_or_equal:today',
-            'start_time' => 'required|date_format:H:i',
+            'start_time' => 'required|date_format:H:i:s',
             'notes' => 'nullable|string|max:1000',
         ]);
 
@@ -157,9 +170,7 @@ class PublicAppointmentController extends Controller
 
         $service = Service::findOrFail($validated['service_id']);
         $stylistId = $validated['stylist_id'] ?? null;
-        $startTime = strlen($validated['start_time']) === 5
-            ? $validated['start_time'] . ':00'
-            : $validated['start_time'];
+        $startTime = $validated['start_time'];
         $endTime = date('H:i:s', strtotime($startTime) + $service->duration_minutes * 60);
 
         $conflict = $this->findConflict(
