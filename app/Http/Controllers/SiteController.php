@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\City;
 use App\Models\MarketingCampaign;
+use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use Inertia\Inertia;
@@ -106,6 +108,16 @@ class SiteController extends Controller
 
         return Inertia::render('site/Contact', [
             'branches' => $branches,
+        ]);
+    }
+
+    public function products(): Response
+    {
+        $categories = ProductCategory::with(['products' => fn($q) => $q->active()])
+            ->get();
+
+        return Inertia::render('site/Products', [
+            'categories' => $categories,
         ]);
     }
 }

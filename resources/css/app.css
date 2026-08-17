@@ -501,3 +501,181 @@
         box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
     }
 }
+/* ============================================================
+   VIEW TRANSITIONS API - Navegación fluida entre páginas
+   ============================================================ */
+
+/* Transición base para todos los elementos */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 400ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Animación de salida - Fade out con slide */
+::view-transition-old(root) {
+    animation-name: fade-out-slide;
+}
+
+/* Animación de entrada - Fade in con slide */
+::view-transition-new(root) {
+    animation-name: fade-in-slide;
+}
+
+@keyframes fade-out-slide {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes fade-in-slide {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Transiciones suaves para imágenes específicas */
+::view-transition-old(hero-image),
+::view-transition-new(hero-image) {
+    animation-duration: 600ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    mix-blend-mode: normal;
+}
+
+/* Animación especial para imágenes hero */
+::view-transition-old(hero-image) {
+    animation-name: hero-fade-out;
+}
+
+::view-transition-new(hero-image) {
+    animation-name: hero-fade-in;
+}
+
+@keyframes hero-fade-out {
+    from {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        filter: blur(10px);
+        transform: scale(0.98);
+    }
+}
+
+@keyframes hero-fade-in {
+    from {
+        opacity: 0;
+        filter: blur(10px);
+        transform: scale(1.02);
+    }
+    to {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+    }
+}
+
+/* Transiciones para cards y elementos interactivos */
+::view-transition-old(card),
+::view-transition-new(card) {
+    animation-duration: 500ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(card) {
+    animation-name: card-fade-out;
+}
+
+::view-transition-new(card) {
+    animation-name: card-fade-in;
+}
+
+@keyframes card-fade-out {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+@keyframes card-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(1.05);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Navegación hacia atrás - Animación invertida */
+@media (prefers-reduced-motion: no-preference) {
+    html:has([data-navigation="back"]) {
+        ::view-transition-old(root) {
+            animation-name: fade-out-slide-back;
+        }
+        
+        ::view-transition-new(root) {
+            animation-name: fade-in-slide-back;
+        }
+    }
+}
+
+@keyframes fade-out-slide-back {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+@keyframes fade-in-slide-back {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Respetar preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root),
+    ::view-transition-old(hero-image),
+    ::view-transition-new(hero-image),
+    ::view-transition-old(card),
+    ::view-transition-new(card) {
+        animation-duration: 1ms !important;
+        animation-timing-function: linear !important;
+    }
+}
+
+/* Soporte para navegadores sin View Transitions API */
+@supports not (view-transition-name: root) {
+    /* Fallback - CSS transitions básicas */
+    body {
+        transition: opacity 200ms ease-in-out;
+    }
+}

@@ -22,11 +22,21 @@ const mobileOpen = ref(false);
 const navigation = [
     { name: 'Inicio', href: '/' },
     { name: 'Servicios', href: '/servicios' },
+    { name: 'Productos', href: '/productos' },
     { name: 'Sucursales', href: '/sucursales' },
     { name: 'Promociones', href: '/promociones' },
     { name: 'Nosotros', href: '/nosotros' },
     { name: 'Contacto', href: '/contacto' },
 ];
+
+// Función para determinar si un link está activo
+const isActive = (href: string) => {
+    const currentPath = page.url.split('?')[0]; // Remover query params
+    if (href === '/') {
+        return currentPath === '/';
+    }
+    return currentPath.startsWith(href);
+};
 </script>
 
 <template>
@@ -43,8 +53,10 @@ const navigation = [
                             v-for="item in navigation"
                             :key="item.name"
                             :href="item.href"
-                            class="rounded-md px-3 py-2 text-sm font-medium tracking-wide text-pearl transition hover:text-silver-bright"
-                            :class="{ 'text-silver-bright': page.url === item.href }"
+                            class="relative rounded-md px-3 py-2 text-sm font-medium tracking-wide transition hover:text-silver-bright"
+                            :class="isActive(item.href)
+                                ? 'text-silver-bright after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-gradient-to-r after:from-gold after:to-gold-bright after:shadow-sm after:shadow-gold/50'
+                                : 'text-pearl'"
                         >
                             {{ item.name }}
                         </Link>
@@ -75,7 +87,10 @@ const navigation = [
                         :key="item.name"
                         :href="item.href"
                         @click="mobileOpen = false"
-                        class="block rounded-md px-3 py-3 text-sm font-medium text-pearl hover:bg-graphite hover:text-silver-bright"
+                        class="block rounded-md px-3 py-3 text-sm font-medium hover:bg-graphite hover:text-silver-bright transition"
+                        :class="isActive(item.href)
+                            ? 'text-silver-bright bg-graphite/50 border-l-2 border-gold'
+                            : 'text-pearl'"
                     >
                         {{ item.name }}
                     </Link>

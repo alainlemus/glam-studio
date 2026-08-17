@@ -28,6 +28,7 @@ Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('/sucursales', [SiteController::class, 'branches'])->name('site.branches');
 Route::get('/sucursales/{slug}', [SiteController::class, 'showBranch'])->name('site.branch.show');
 Route::get('/servicios', [SiteController::class, 'services'])->name('site.services');
+Route::get('/productos', [SiteController::class, 'products'])->name('site.products');
 Route::get('/nosotros', [SiteController::class, 'about'])->name('site.about');
 Route::get('/promociones', [SiteController::class, 'promotions'])->name('site.promotions');
 Route::get('/contacto', [SiteController::class, 'contact'])->name('site.contact');

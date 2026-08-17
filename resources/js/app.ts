@@ -19,6 +19,18 @@ createInertiaApp({
     progress: {
         color: '#ec4899',
     },
+    // Habilitar View Transitions API
+    resolve: async (name) => {
+        const pages = import.meta.glob('./pages/**/*.vue');
+        const page = await pages[`./pages/${name}.vue`]();
+
+        // Habilitar transiciones de vista nativas del navegador
+        if (page && typeof page === 'object' && 'default' in page) {
+            (page as any).default.transition = 'native';
+        }
+
+        return page;
+    },
 });
 
 initializeTheme();
