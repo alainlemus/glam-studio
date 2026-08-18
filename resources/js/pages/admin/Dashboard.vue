@@ -96,32 +96,34 @@ const dayName = computed(() => {
 
         <!-- Métricas principales -->
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="card-elegant card-elegant-hover relative overflow-hidden p-6">
-                <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-silver/5 blur-2xl"></div>
+            <div class="card-elegant card-elegant-hover group relative overflow-hidden p-6 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-silver/10 animate-fade-in" style="animation-delay: 0ms">
+                <div class="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-silver/5 blur-3xl transition-all duration-500 group-hover:scale-150"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-silver/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
                 <div class="relative">
                     <div class="flex items-center justify-between">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-lg border border-silver/20 bg-silver/10">
-                            <CalendarDays class="h-5 w-5 text-silver-bright" />
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-silver/20 bg-silver/10 shadow-lg shadow-silver/10 backdrop-blur-sm transition-all duration-500 group-hover:scale-110 group-hover:border-silver/40">
+                            <CalendarDays class="h-5 w-5 text-silver-bright transition-transform duration-500 group-hover:rotate-12" />
                         </div>
                     </div>
-                    <p class="mt-5 text-xs font-medium uppercase tracking-wider text-mercury">Citas hoy</p>
-                    <p class="mt-1 font-serif text-4xl font-semibold text-cream">{{ stats.appointmentsToday }}</p>
+                    <p class="mt-5 text-xs font-semibold uppercase tracking-wider text-mercury">Citas hoy</p>
+                    <p class="mt-1 font-serif text-4xl font-semibold text-cream transition-all duration-300 group-hover:text-silver-bright">{{ stats.appointmentsToday }}</p>
                     <p class="mt-2 text-xs text-mercury">
                         <span class="font-semibold text-silver-bright">{{ stats.pendingAppointments }}</span> por confirmar
                     </p>
                 </div>
             </div>
 
-            <div class="card-elegant card-elegant-hover relative overflow-hidden p-6">
-                <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-emerald-500/10 blur-2xl"></div>
+            <div class="card-elegant card-elegant-hover group relative overflow-hidden p-6 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-500/20 animate-fade-in" style="animation-delay: 100ms">
+                <div class="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-emerald-500/10 blur-3xl transition-all duration-500 group-hover:scale-150"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
                 <div class="relative">
                     <div class="flex items-center justify-between">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10">
-                            <DollarSign class="h-5 w-5 text-emerald-400" />
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 shadow-lg shadow-emerald-500/20 backdrop-blur-sm transition-all duration-500 group-hover:scale-110 group-hover:border-emerald-500/50">
+                            <DollarSign class="h-5 w-5 text-emerald-400 transition-transform duration-500 group-hover:rotate-12" />
                         </div>
                     </div>
-                    <p class="mt-5 text-xs font-medium uppercase tracking-wider text-mercury">Ventas del mes</p>
-                    <p class="mt-1 font-serif text-3xl font-semibold text-cream">{{ formatPrice(stats.monthlySales) }}</p>
+                    <p class="mt-5 text-xs font-semibold uppercase tracking-wider text-mercury">Ventas del mes</p>
+                    <p class="mt-1 font-serif text-3xl font-semibold text-cream transition-all duration-300 group-hover:text-emerald-400">{{ formatPrice(stats.monthlySales) }}</p>
                     <p :class="['mt-2 inline-flex items-center gap-1 text-xs font-semibold', stats.salesGrowth >= 0 ? 'text-emerald-400' : 'text-red-400']">
                         <component :is="stats.salesGrowth >= 0 ? TrendingUp : TrendingDown" class="h-3 w-3" />
                         {{ stats.salesGrowth >= 0 ? '+' : '' }}{{ Math.abs(stats.salesGrowth).toFixed(1) }}% vs mes anterior
@@ -129,16 +131,17 @@ const dayName = computed(() => {
                 </div>
             </div>
 
-            <div class="card-elegant card-elegant-hover relative overflow-hidden p-6">
-                <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-silver-bright/5 blur-2xl"></div>
+            <div class="card-elegant card-elegant-hover group relative overflow-hidden p-6 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-silver/10 animate-fade-in" style="animation-delay: 200ms">
+                <div class="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-silver-bright/5 blur-3xl transition-all duration-500 group-hover:scale-150"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-silver-bright/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
                 <div class="relative">
                     <div class="flex items-center justify-between">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-lg border border-silver/20 bg-silver/10">
-                            <TrendingUp class="h-5 w-5 text-silver-bright" />
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-silver/20 bg-silver/10 shadow-lg shadow-silver/10 backdrop-blur-sm transition-all duration-500 group-hover:scale-110 group-hover:border-silver/40">
+                            <TrendingUp class="h-5 w-5 text-silver-bright transition-transform duration-500 group-hover:rotate-12" />
                         </div>
                     </div>
-                    <p class="mt-5 text-xs font-medium uppercase tracking-wider text-mercury">Utilidad del mes</p>
-                    <p :class="['mt-1 font-serif text-3xl font-semibold', stats.monthlyProfit >= 0 ? 'text-cream' : 'text-red-400']">
+                    <p class="mt-5 text-xs font-semibold uppercase tracking-wider text-mercury">Utilidad del mes</p>
+                    <p :class="['mt-1 font-serif text-3xl font-semibold transition-all duration-300', stats.monthlyProfit >= 0 ? 'text-cream group-hover:text-silver-bright' : 'text-red-400']">
                         {{ formatPrice(stats.monthlyProfit) }}
                     </p>
                     <p class="mt-2 text-xs text-mercury">
@@ -147,16 +150,17 @@ const dayName = computed(() => {
                 </div>
             </div>
 
-            <div class="card-elegant card-elegant-hover relative overflow-hidden p-6">
-                <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-red-500/10 blur-2xl"></div>
+            <div class="card-elegant card-elegant-hover group relative overflow-hidden p-6 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-red-500/20 animate-fade-in" style="animation-delay: 300ms">
+                <div class="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-red-500/10 blur-3xl transition-all duration-500 group-hover:scale-150"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
                 <div class="relative">
                     <div class="flex items-center justify-between">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10">
-                            <Wallet class="h-5 w-5 text-red-400" />
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 shadow-lg shadow-red-500/20 backdrop-blur-sm transition-all duration-500 group-hover:scale-110 group-hover:border-red-500/50">
+                            <Wallet class="h-5 w-5 text-red-400 transition-transform duration-500 group-hover:rotate-12" />
                         </div>
                     </div>
-                    <p class="mt-5 text-xs font-medium uppercase tracking-wider text-mercury">Egresos del mes</p>
-                    <p class="mt-1 font-serif text-3xl font-semibold text-cream">{{ formatPrice(stats.monthlyExpenses) }}</p>
+                    <p class="mt-5 text-xs font-semibold uppercase tracking-wider text-mercury">Egresos del mes</p>
+                    <p class="mt-1 font-serif text-3xl font-semibold text-cream transition-all duration-300 group-hover:text-red-400">{{ formatPrice(stats.monthlyExpenses) }}</p>
                     <p class="mt-2 text-xs text-mercury">
                         <span :class="stats.lowStockCount > 0 ? 'font-semibold text-red-400' : 'font-semibold text-cream'">{{ stats.lowStockCount }}</span> productos con stock bajo
                     </p>
@@ -167,13 +171,14 @@ const dayName = computed(() => {
         <!-- Gráficos -->
         <div class="grid gap-4 lg:grid-cols-3">
             <!-- Ventas 7 días -->
-            <div class="card-elegant p-6 lg:col-span-2 animate-fade-up">
-                <div class="flex items-center justify-between">
+            <div class="card-elegant group relative overflow-hidden p-6 lg:col-span-2 animate-fade-up transition-all duration-300 hover:shadow-xl hover:shadow-silver/5">
+                <div class="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gradient-to-br from-silver/5 to-transparent blur-3xl"></div>
+                <div class="relative flex items-center justify-between">
                     <div>
                         <p class="text-eyebrow">Tendencia</p>
                         <h3 class="mt-1 font-serif text-xl font-medium">Ventas últimos 7 días</h3>
                     </div>
-                    <Sparkles class="h-5 w-5 text-silver/40" />
+                    <Sparkles class="h-5 w-5 text-silver/40 transition-transform duration-300 group-hover:rotate-12 group-hover:text-silver-bright" />
                 </div>
                 <div class="mt-8 space-y-3">
                     <div v-for="day in salesLast7Days" :key="day.date" class="flex items-center gap-3">
@@ -198,8 +203,9 @@ const dayName = computed(() => {
             </div>
 
             <!-- Estatus de citas -->
-            <div class="card-elegant p-6 animate-fade-up">
-                <div class="flex items-center justify-between">
+            <div class="card-elegant group relative overflow-hidden p-6 animate-fade-up transition-all duration-300 hover:shadow-xl hover:shadow-silver/5">
+                <div class="absolute -right-8 -top-8 h-48 w-48 rounded-full bg-gradient-to-br from-purple-500/5 to-transparent blur-3xl"></div>
+                <div class="relative flex items-center justify-between">
                     <div>
                         <p class="text-eyebrow">Mes en curso</p>
                         <h3 class="mt-1 font-serif text-xl font-medium">Estado</h3>
@@ -225,8 +231,9 @@ const dayName = computed(() => {
 
         <!-- Próximas citas -->
         <div class="grid gap-4 lg:grid-cols-3">
-            <div class="card-elegant overflow-hidden lg:col-span-2 animate-fade-up">
-                <div class="flex items-center justify-between border-b border-smoke px-6 py-4">
+            <div class="card-elegant group relative overflow-hidden lg:col-span-2 animate-fade-up transition-all duration-300 hover:shadow-xl hover:shadow-silver/5">
+                <div class="absolute -right-16 top-0 h-64 w-64 rounded-full bg-gradient-to-bl from-blue-500/5 to-transparent blur-3xl"></div>
+                <div class="relative flex items-center justify-between border-b border-smoke/70 px-6 py-4">
                     <div>
                         <p class="text-eyebrow">Agenda inmediata</p>
                         <h3 class="mt-1 font-serif text-xl font-medium">Próximas citas</h3>
@@ -275,9 +282,12 @@ const dayName = computed(() => {
             </div>
 
             <!-- Top estilistas -->
-            <div v-if="isAdmin" class="card-elegant p-6 animate-fade-up">
-                <p class="text-eyebrow">Destacados</p>
-                <h3 class="mt-1 font-serif text-xl font-medium">Top del mes</h3>
+            <div v-if="isAdmin" class="card-elegant group relative overflow-hidden p-6 animate-fade-up transition-all duration-300 hover:shadow-xl hover:shadow-silver/5">
+                <div class="absolute -right-8 -top-8 h-48 w-48 rounded-full bg-gradient-to-br from-gold/10 to-transparent blur-3xl"></div>
+                <div class="relative">
+                    <p class="text-eyebrow">Destacados</p>
+                    <h3 class="mt-1 font-serif text-xl font-medium">Top del mes</h3>
+                </div>
                 <div class="mt-6 space-y-3">
                     <div v-if="topStylists.length === 0" class="py-6 text-center text-sm text-mercury">
                         Sin datos este mes
@@ -306,26 +316,29 @@ const dayName = computed(() => {
             </div>
 
             <!-- Acciones rápidas para no-admin -->
-            <div v-else class="card-elegant p-6 animate-fade-up">
-                <p class="text-eyebrow">Atajos</p>
-                <h3 class="mt-1 font-serif text-xl font-medium">Acciones rápidas</h3>
-                <div class="mt-6 grid grid-cols-2 gap-3">
-                    <Link href="/admin/appointments/create" class="card-elegant flex flex-col items-center gap-3 p-5 transition hover:border-silver/40">
-                        <Plus class="h-5 w-5 text-silver-bright" />
-                        <span class="text-xs font-medium">Nueva cita</span>
-                    </Link>
-                    <Link href="/admin/sales/create" class="card-elegant flex flex-col items-center gap-3 p-5 transition hover:border-silver/40">
-                        <DollarSign class="h-5 w-5 text-silver-bright" />
-                        <span class="text-xs font-medium">Nueva venta</span>
-                    </Link>
-                    <Link href="/admin/clients" class="card-elegant flex flex-col items-center gap-3 p-5 transition hover:border-silver/40">
-                        <Users class="h-5 w-5 text-silver-bright" />
-                        <span class="text-xs font-medium">Clientes</span>
-                    </Link>
-                    <Link href="/admin/expenses/create" class="card-elegant flex flex-col items-center gap-3 p-5 transition hover:border-silver/40">
-                        <Wallet class="h-5 w-5 text-silver-bright" />
-                        <span class="text-xs font-medium">Egreso</span>
-                    </Link>
+            <div v-else class="card-elegant group relative overflow-hidden p-6 animate-fade-up transition-all duration-300 hover:shadow-xl hover:shadow-silver/5">
+                <div class="absolute -right-8 -top-8 h-48 w-48 rounded-full bg-gradient-to-br from-silver/5 to-transparent blur-3xl"></div>
+                <div class="relative">
+                    <p class="text-eyebrow">Atajos</p>
+                    <h3 class="mt-1 font-serif text-xl font-medium">Acciones rápidas</h3>
+                    <div class="mt-6 grid grid-cols-2 gap-3">
+                        <Link href="/admin/appointments/create" class="card-elegant group/item flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-105 hover:border-silver/40 hover:shadow-lg hover:shadow-silver/10">
+                            <Plus class="h-5 w-5 text-silver-bright transition-transform duration-300 group-hover/item:rotate-90" />
+                            <span class="text-xs font-medium">Nueva cita</span>
+                        </Link>
+                        <Link href="/admin/sales/create" class="card-elegant group/item flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-105 hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-500/10">
+                            <DollarSign class="h-5 w-5 text-emerald-400 transition-transform duration-300 group-hover/item:scale-110" />
+                            <span class="text-xs font-medium">Nueva venta</span>
+                        </Link>
+                        <Link href="/admin/clients" class="card-elegant group/item flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-105 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-500/10">
+                            <Users class="h-5 w-5 text-blue-400 transition-transform duration-300 group-hover/item:scale-110" />
+                            <span class="text-xs font-medium">Clientes</span>
+                        </Link>
+                        <Link href="/admin/expenses/create" class="card-elegant group/item flex flex-col items-center gap-3 p-5 transition-all duration-300 hover:scale-105 hover:border-red-500/40 hover:shadow-lg hover:shadow-red-500/10">
+                            <Wallet class="h-5 w-5 text-red-400 transition-transform duration-300 group-hover/item:scale-110" />
+                            <span class="text-xs font-medium">Egreso</span>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

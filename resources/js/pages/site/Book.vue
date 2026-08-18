@@ -144,12 +144,8 @@ const isPopularSlot = (slotTime: string) => {
     return popularHours.includes(slotTime.slice(0, 5));
 };
 
-// Mock de fotos para estilistas (en producción vendrían del backend)
-const stylistPhotos: Record<number, string> = {
-    1: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=200&q=80',
-    2: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=200&q=80',
-    3: 'https://images.unsplash.com/photo-1595475038663-8d9f14b0eb7e?w=200&q=80',
-};
+// Foto genérica de estilista como fallback
+const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=200&q=80';
 </script>
 
 <template>
@@ -493,12 +489,13 @@ const stylistPhotos: Record<number, string> = {
                                         >
                                             <div class="flex items-center gap-3">
                                                 <img
-                                                    :src="stylistPhotos[stylist.id] || 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=200&q=80'"
-                                                    :alt="stylist.name"
+                                                    :src="defaultStylistPhoto"
+                                                    :alt="stylist.user?.name || 'Estilista'"
                                                     class="h-12 w-12 rounded-full object-cover ring-2 ring-smoke"
+                                                    @error="(e) => (e.target as HTMLImageElement).src = defaultStylistPhoto"
                                                 />
                                                 <div>
-                                                    <p class="text-sm font-semibold text-cream">{{ stylist.name }}</p>
+                                                    <p class="text-sm font-semibold text-cream">{{ stylist.user?.name || 'Estilista' }}</p>
                                                     <p class="text-xs text-mercury">Estilista</p>
                                                 </div>
                                             </div>

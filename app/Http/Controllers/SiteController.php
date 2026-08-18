@@ -114,6 +114,7 @@ class SiteController extends Controller
     public function products(): Response
     {
         $categories = ProductCategory::with(['products' => fn($q) => $q->active()])
+            ->active()
             ->get();
 
         return Inertia::render('site/Products', [

@@ -15,10 +15,15 @@ withDefaults(
 
 <template>
     <header
-        class="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4"
+        class="relative flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/30 bg-gradient-to-r from-sidebar-background/95 via-sidebar-background/98 to-sidebar-background/95 px-6 backdrop-blur-md transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4"
     >
-        <div class="flex items-center gap-2">
-            <SidebarTrigger class="-ml-1" />
+        <!-- Subtle gradient decoration -->
+        <div class="pointer-events-none absolute inset-0 opacity-20">
+            <div class="absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-silver/5 to-transparent"></div>
+        </div>
+
+        <div class="relative flex items-center gap-2">
+            <SidebarTrigger class="-ml-1 transition-transform hover:scale-110" />
             <template v-if="breadcrumbs && breadcrumbs.length > 0">
                 <Breadcrumbs :breadcrumbs="breadcrumbs" />
             </template>
