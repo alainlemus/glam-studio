@@ -60,7 +60,7 @@ const serviceImages: Record<number, string> = {
             </div>
 
             <h1 class="mt-3 font-serif text-5xl font-bold tracking-tight text-cream lg:text-6xl">
-                Nuestros <span class="italic" style="color: var(--color-spa-pink)">servicios</span>
+                Nuestros <span class="italic" style="color: var(--color-silver-bright)">servicios</span>
             </h1>
             <p class="mt-6 max-w-2xl mx-auto text-lg text-pearl">
                 Transforma tu look con nuestros tratamientos profesionales. Cada servicio está diseñado para realzar tu belleza natural.
@@ -115,7 +115,7 @@ const serviceImages: Record<number, string> = {
                             <!-- Badge de precio -->
                             <div class="absolute bottom-3 right-3">
                                 <div class="glass-card px-3 py-1.5">
-                                    <span class="font-serif text-sm font-bold" style="color: var(--color-spa-pink)">
+                                    <span class="font-serif text-sm font-bold" style="color: var(--color-gold)">
                                         {{ formatPrice(service.price) }}
                                     </span>
                                 </div>
@@ -150,7 +150,7 @@ const serviceImages: Record<number, string> = {
                             <Link
                                 :href="`/agendar?service=${service.id}`"
                                 class="mt-5 flex items-center justify-center gap-2 rounded-xl border-2 border-transparent bg-gradient-to-r from-silver/10 to-silver/5 px-4 py-3 text-sm font-semibold text-cream transition-all hover:border-silver/30 hover:scale-105"
-                                style="background: linear-gradient(135deg, var(--color-spa-lavender) 0%, var(--color-spa-pink) 100%); opacity: 0.9;"
+                                style="background: linear-gradient(135deg, var(--color-silver) 0%, var(--color-gold) 100%); opacity: 0.9;"
                             >
                                 Reservar ahora
                                 <ChevronRight class="h-4 w-4" />
@@ -165,7 +165,7 @@ const serviceImages: Record<number, string> = {
     <!-- CTA FINAL -->
     <section class="relative overflow-hidden bg-gradient-dark py-20 lg:py-28">
         <div class="pointer-events-none absolute inset-0">
-            <div class="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" style="background: var(--color-spa-pink); opacity: 0.08;"></div>
+            <div class="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" style="background: var(--color-gold); opacity: 0.1;"></div>
         </div>
 
         <div class="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">

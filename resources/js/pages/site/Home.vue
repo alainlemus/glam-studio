@@ -40,6 +40,16 @@ const categoryImages: Record<number, string> = {
     3: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&q=80',
     4: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=600&q=80',
 };
+
+// Fotos únicas para cada sucursal (mismo mapeo que Branches.vue)
+const branchImages: Record<number, string> = {
+    1: 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=800&q=80',
+    2: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80',
+    3: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80',
+    4: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&q=80',
+    5: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&q=80',
+    6: 'https://images.unsplash.com/photo-1595475038663-8d9f14b0eb7e?w=800&q=80',
+};
 </script>
 
 <template>
@@ -63,7 +73,7 @@ const categoryImages: Record<number, string> = {
         <div class="pointer-events-none absolute inset-0 opacity-40">
             <div class="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-silver/10 blur-[120px] animate-pulse"></div>
             <div class="absolute left-1/4 top-1/4 h-[400px] w-[400px] rounded-full animate-sparkle" style="background: var(--color-spa-lavender); opacity: 0.08; filter: blur(100px);"></div>
-            <div class="absolute right-1/4 bottom-1/3 h-[450px] w-[450px] rounded-full animate-sparkle animation-delay-300" style="background: var(--color-spa-pink); opacity: 0.06; filter: blur(110px);"></div>
+            <div class="absolute right-1/4 bottom-1/3 h-[450px] w-[450px] rounded-full animate-sparkle animation-delay-300" style="background: var(--color-silver-bright); opacity: 0.1; filter: blur(110px);"></div>
         </div>
 
         <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -78,15 +88,15 @@ const categoryImages: Record<number, string> = {
                     <h1 class="font-serif text-5xl font-bold leading-[1.1] tracking-tight lg:text-7xl animate-blur-fade-in animation-delay-100">
                         Tu belleza,
                         <br />
-                        <span class="relative inline-block italic" style="color: var(--color-spa-pink)">
+                        <span class="relative inline-block italic" style="color: var(--color-silver-bright)">
                             nuestra pasión
                             <svg class="absolute -bottom-2 left-0 w-full animate-fade-in animation-delay-300" height="12" viewBox="0 0 400 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M2 10C100 4 300 4 398 10" stroke="url(#gradient-home)" stroke-width="3" stroke-linecap="round"/>
                                 <defs>
                                     <linearGradient id="gradient-home" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" style="stop-color:var(--color-spa-pink);stop-opacity:0.3" />
-                                        <stop offset="50%" style="stop-color:var(--color-spa-lavender);stop-opacity:0.8" />
-                                        <stop offset="100%" style="stop-color:var(--color-spa-pink);stop-opacity:0.3" />
+                                        <stop offset="0%" style="stop-color:var(--color-silver-bright);stop-opacity:0.5" />
+                                        <stop offset="50%" style="stop-color:var(--color-gold);stop-opacity:0.9" />
+                                        <stop offset="100%" style="stop-color:var(--color-silver-bright);stop-opacity:0.5" />
                                     </linearGradient>
                                 </defs>
                             </svg>
@@ -149,7 +159,7 @@ const categoryImages: Record<number, string> = {
                     </div>
 
                     <!-- Decorative elements -->
-                    <Sparkles class="absolute -top-4 right-12 h-8 w-8 animate-sparkle" style="color: var(--color-spa-pink)" />
+                    <Sparkles class="absolute -top-4 right-12 h-8 w-8 animate-sparkle" style="color: var(--color-gold)" />
                     <Sparkles class="absolute bottom-12 -left-4 h-6 w-6 animate-sparkle animation-delay-500" style="color: var(--color-spa-lavender)" />
                 </div>
             </div>
@@ -162,7 +172,7 @@ const categoryImages: Record<number, string> = {
             <div class="mb-10 text-center animate-fade-in">
                 <p class="text-eyebrow">Transformaciones reales</p>
                 <h2 class="mt-3 font-serif text-4xl font-medium tracking-tight lg:text-5xl">
-                    Antes y <span class="italic" style="color: var(--color-spa-pink)">después</span>
+                    Antes y <span class="italic" style="color: var(--color-silver-bright)">después</span>
                 </h2>
             </div>
 
@@ -192,7 +202,7 @@ const categoryImages: Record<number, string> = {
                     />
                     <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                         <div class="absolute bottom-0 left-0 right-0 p-4">
-                            <p class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-spa-pink)">Peinado</p>
+                            <p class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-gold)">Peinado</p>
                             <p class="mt-1 text-sm text-cream">Recogido de novia</p>
                         </div>
                     </div>
@@ -222,7 +232,7 @@ const categoryImages: Record<number, string> = {
                     />
                     <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                         <div class="absolute bottom-0 left-0 right-0 p-4">
-                            <p class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-spa-pink)">Corte</p>
+                            <p class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-silver-bright)">Corte</p>
                             <p class="mt-1 text-sm text-cream">Bob asimétrico</p>
                         </div>
                     </div>
@@ -276,7 +286,7 @@ const categoryImages: Record<number, string> = {
 
                         <div class="mt-5 flex items-center justify-between border-t border-smoke pt-4 text-xs">
                             <span class="text-mercury">{{ category.services?.length || 0 }} servicios</span>
-                            <ChevronRight class="h-4 w-4 transition group-hover:translate-x-1" style="color: var(--color-spa-pink)" />
+                            <ChevronRight class="h-4 w-4 transition group-hover:translate-x-1" style="color: var(--color-gold)" />
                         </div>
                     </div>
                 </Link>
@@ -298,7 +308,7 @@ const categoryImages: Record<number, string> = {
                 <div>
                     <p class="text-eyebrow">Encuentra tu salón</p>
                     <h2 class="mt-3 font-serif text-4xl font-medium tracking-tight lg:text-5xl">
-                        Nuestras <span class="italic" style="color: var(--color-spa-pink)">sucursales</span>
+                        Nuestras <span class="italic" style="color: var(--color-silver-bright)">sucursales</span>
                     </h2>
                 </div>
                 <Link href="/sucursales" class="text-sm font-medium text-silver-bright hover:text-silver-bright-bright">
@@ -317,7 +327,7 @@ const categoryImages: Record<number, string> = {
                     <!-- Imagen de la sucursal -->
                     <div class="relative aspect-[4/3] overflow-hidden">
                         <img
-                            src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=800&q=80"
+                            :src="branchImages[branch.id] || 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=800&q=80'"
                             :alt="`Sucursal ${branch.name}`"
                             class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
@@ -339,7 +349,7 @@ const categoryImages: Record<number, string> = {
                                 <span>{{ branch.address }}</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <Phone class="h-3 w-3 shrink-0" style="color: var(--color-spa-pink)" />
+                                <Phone class="h-3 w-3 shrink-0" style="color: var(--color-gold)" />
                                 <span>{{ branch.phone }}</span>
                             </div>
                         </div>
@@ -359,7 +369,7 @@ const categoryImages: Record<number, string> = {
             <div class="text-center">
                 <p class="text-eyebrow">Ofertas especiales</p>
                 <h2 class="mt-3 font-serif text-4xl font-medium tracking-tight lg:text-5xl">
-                    <span class="italic" style="color: var(--color-spa-pink)">Promociones</span> vigentes
+                    <span class="italic" style="color: var(--color-gold)">Promociones</span> vigentes
                 </h2>
             </div>
 
@@ -376,7 +386,7 @@ const categoryImages: Record<number, string> = {
                     <h3 class="mt-4 font-serif text-2xl font-semibold text-cream">{{ campaign.name }}</h3>
                     <p class="mt-3 text-sm text-mercury">{{ campaign.description }}</p>
                     <div v-if="campaign.discount_percentage" class="mt-6">
-                        <div class="font-serif text-5xl font-bold" style="color: var(--color-spa-pink)">
+                        <div class="font-serif text-5xl font-bold" style="color: var(--color-gold)">
                             -{{ campaign.discount_percentage }}%
                         </div>
                     </div>
@@ -393,13 +403,13 @@ const categoryImages: Record<number, string> = {
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
             <div class="relative overflow-hidden rounded-3xl glass-card p-10 text-center shadow-gold-lg lg:p-16">
                 <div class="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full blur-3xl" style="background: var(--color-spa-lavender); opacity: 0.1;"></div>
-                <div class="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full blur-3xl" style="background: var(--color-spa-pink); opacity: 0.1;"></div>
+                <div class="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full blur-3xl" style="background: var(--color-gold); opacity: 0.12;"></div>
 
                 <Crown class="mx-auto h-10 w-10 text-silver-bright" />
 
                 <h2 class="mt-6 font-serif text-4xl font-medium leading-tight tracking-tight lg:text-5xl">
                     ¿Lista para renovar <br />
-                    tu <span class="italic" style="color: var(--color-spa-pink)">look</span>?
+                    tu <span class="italic" style="color: var(--color-silver-bright)">look</span>?
                 </h2>
 
                 <p class="mx-auto mt-4 max-w-md text-mercury">

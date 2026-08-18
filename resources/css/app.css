@@ -38,7 +38,7 @@
     --color-charcoal: #141414;
     --color-graphite: #1F1F1F;
     --color-smoke: #2A2A2A;
-    --color-mercury: #6B7280;
+    --color-mercury: #9CA3AF;
     --color-pearl: #D4D4D8;
     --color-cream: #FAF7F2;
     --color-ivory: #F5EDE0;
@@ -261,6 +261,7 @@
                focus:border-silver-bright focus:outline-none focus:ring-2 focus:ring-silver/30
                transition-all duration-300 ease-out
                hover:border-silver/30;
+        color-scheme: dark;
     }
 
     .chip {

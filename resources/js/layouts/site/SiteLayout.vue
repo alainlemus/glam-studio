@@ -70,9 +70,13 @@ const isActive = (href: string) => {
 
                         <button
                             @click="mobileOpen = !mobileOpen"
+                            type="button"
+                            :aria-expanded="mobileOpen"
+                            aria-controls="site-mobile-menu"
+                            :aria-label="mobileOpen ? 'Cerrar menú' : 'Abrir menú'"
                             class="md:hidden flex h-11 w-11 items-center justify-center rounded-full border border-smoke bg-graphite text-cream"
                         >
-                            <component :is="mobileOpen ? X : Menu" class="h-5 w-5" />
+                            <component :is="mobileOpen ? X : Menu" class="h-5 w-5" aria-hidden="true" />
                         </button>
                     </div>
                 </div>
@@ -80,6 +84,7 @@ const isActive = (href: string) => {
                 <!-- Mobile menu -->
                 <div
                     v-if="mobileOpen"
+                    id="site-mobile-menu"
                     class="border-t border-smoke pb-4 pt-3 md:hidden animate-fade-in"
                 >
                     <Link

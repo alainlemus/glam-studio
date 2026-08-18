@@ -28,7 +28,7 @@ defineProps<{
 
         <!-- Mesh gradients -->
         <div class="pointer-events-none absolute inset-0 opacity-40">
-            <div class="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" style="background: var(--color-spa-pink); opacity: 0.1;"></div>
+            <div class="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" style="background: var(--color-gold); opacity: 0.12;"></div>
         </div>
 
         <div class="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center animate-blur-fade-in">
@@ -38,7 +38,7 @@ defineProps<{
             </div>
 
             <h1 class="mt-3 font-serif text-5xl font-bold tracking-tight text-cream lg:text-6xl">
-                Sobre <span class="italic" style="color: var(--color-spa-pink)">nosotros</span>
+                Sobre <span class="italic" style="color: var(--color-silver-bright)">nosotros</span>
             </h1>
             <p class="mt-6 text-lg leading-relaxed text-pearl">
                 En <span class="font-serif italic text-silver-bright">Glam Studio</span> somos un equipo de profesionales
@@ -53,22 +53,22 @@ defineProps<{
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105 animate-fade-in">
                     <Sparkles class="mx-auto h-10 w-10 animate-sparkle" style="color: var(--color-spa-lavender)" />
-                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-spa-pink)">{{ stats.branches }}+</div>
+                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)">{{ stats.branches }}+</div>
                     <div class="mt-2 text-xs uppercase tracking-wider text-mercury">Sucursales</div>
                 </div>
                 <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105 animate-fade-in animation-delay-100">
                     <Users class="mx-auto h-10 w-10" style="color: var(--color-spa-lavender)" />
-                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-spa-pink)">{{ stats.stylists }}+</div>
+                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)">{{ stats.stylists }}+</div>
                     <div class="mt-2 text-xs uppercase tracking-wider text-mercury">Estilistas</div>
                 </div>
                 <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105 animate-fade-in animation-delay-200">
                     <Award class="mx-auto h-10 w-10" style="color: var(--color-spa-lavender)" />
-                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-spa-pink)">{{ stats.services }}+</div>
+                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)">{{ stats.services }}+</div>
                     <div class="mt-2 text-xs uppercase tracking-wider text-mercury">Servicios</div>
                 </div>
                 <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105 animate-fade-in animation-delay-300">
                     <Star class="mx-auto h-10 w-10" style="color: var(--color-spa-lavender)" />
-                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-spa-pink)">{{ stats.clients }}+</div>
+                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)">{{ stats.clients }}+</div>
                     <div class="mt-2 text-xs uppercase tracking-wider text-mercury">Clientes felices</div>
                 </div>
             </div>
@@ -87,7 +87,7 @@ defineProps<{
                 <div class="animate-blur-fade-in">
                     <p class="text-eyebrow">Nuestra misión</p>
                     <h2 class="mt-3 font-serif text-4xl font-bold lg:text-5xl">
-                        Pasión por la <span class="italic" style="color: var(--color-spa-pink)">belleza</span>
+                        Pasión por la <span class="italic" style="color: var(--color-silver-bright)">belleza</span>
                     </h2>
                     <div class="mt-6 space-y-4 text-lg leading-relaxed text-pearl">
                         <p>
@@ -118,7 +118,7 @@ defineProps<{
                         <div class="absolute bottom-6 left-6 right-6">
                             <div class="glass-card p-4">
                                 <div class="flex items-center gap-3">
-                                    <Sparkles class="h-6 w-6 animate-sparkle" style="color: var(--color-spa-pink)" />
+                                    <Sparkles class="h-6 w-6 animate-sparkle" style="color: var(--color-gold)" />
                                     <div>
                                         <p class="text-sm font-bold text-cream">Calidad Certificada</p>
                                         <p class="text-xs text-mercury">Estilistas profesionales</p>
@@ -130,7 +130,7 @@ defineProps<{
 
                     <!-- Sparkles decorativos -->
                     <Sparkles class="absolute -top-4 -right-4 h-8 w-8 animate-sparkle" style="color: var(--color-spa-lavender)" />
-                    <Sparkles class="absolute -bottom-4 -left-4 h-6 w-6 animate-sparkle animation-delay-500" style="color: var(--color-spa-pink)" />
+                    <Sparkles class="absolute -bottom-4 -left-4 h-6 w-6 animate-sparkle animation-delay-500" style="color: var(--color-gold)" />
                 </div>
             </div>
         </div>
@@ -142,7 +142,7 @@ defineProps<{
             <div class="mb-12 text-center">
                 <p class="text-eyebrow">Conoce al equipo</p>
                 <h2 class="mt-3 font-serif text-4xl font-bold lg:text-5xl">
-                    Nuestros <span class="italic" style="color: var(--color-spa-pink)">profesionales</span>
+                    Nuestros <span class="italic" style="color: var(--color-silver-bright)">profesionales</span>
                 </h2>
             </div>
 
@@ -221,7 +221,7 @@ defineProps<{
             <div class="mb-12 text-center">
                 <p class="text-eyebrow">Presencia</p>
                 <h2 class="mt-3 font-serif text-4xl font-bold lg:text-5xl">
-                    Ciudades donde <span class="italic" style="color: var(--color-spa-pink)">estamos</span>
+                    Ciudades donde <span class="italic" style="color: var(--color-silver-bright)">estamos</span>
                 </h2>
             </div>
 
@@ -239,7 +239,7 @@ defineProps<{
     <section class="bg-ink py-20 lg:py-28">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
             <div class="glass-card rounded-3xl p-10 lg:p-16">
-                <Heart class="mx-auto h-12 w-12 animate-pulse" style="color: var(--color-spa-pink)" />
+                <Heart class="mx-auto h-12 w-12 animate-pulse" style="color: var(--color-gold)" />
                 <h2 class="mt-6 font-serif text-4xl font-bold lg:text-5xl">
                     Únete a nuestra familia
                 </h2>

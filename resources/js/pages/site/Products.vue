@@ -46,7 +46,7 @@ const productImages: Record<number, string> = {
 
         <!-- Mesh gradients -->
         <div class="pointer-events-none absolute inset-0 opacity-40">
-            <div class="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" style="background: var(--color-spa-pink); opacity: 0.1;"></div>
+            <div class="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" style="background: var(--color-gold); opacity: 0.12;"></div>
         </div>
 
         <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center animate-blur-fade-in">
@@ -56,7 +56,7 @@ const productImages: Record<number, string> = {
             </div>
 
             <h1 class="mt-3 font-serif text-5xl font-bold tracking-tight text-cream lg:text-6xl">
-                Nuestros <span class="italic" style="color: var(--color-spa-pink)">productos</span>
+                Nuestros <span class="italic" style="color: var(--color-silver-bright)">productos</span>
             </h1>
             <p class="mt-6 max-w-2xl mx-auto text-lg text-pearl">
                 Descubre productos profesionales de alta calidad disponibles en nuestras sucursales. Cuida tu cabello y piel con lo mejor.
@@ -82,7 +82,7 @@ const productImages: Record<number, string> = {
                         <div class="absolute inset-0 flex items-end p-8 lg:p-12">
                             <div class="animate-blur-fade-in" :style="{ animationDelay: `${catIndex * 100}ms` }">
                                 <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl glass-card">
-                                    <Package class="h-8 w-8" style="color: var(--color-spa-pink)" />
+                                    <Package class="h-8 w-8" style="color: var(--color-gold)" />
                                 </div>
                                 <h2 class="font-serif text-4xl font-bold text-cream lg:text-5xl">{{ category.name }}</h2>
                                 <p v-if="category.description" class="mt-2 max-w-2xl text-lg text-pearl">{{ category.description }}</p>
@@ -111,7 +111,7 @@ const productImages: Record<number, string> = {
                             <!-- Badge de precio -->
                             <div class="absolute top-3 right-3">
                                 <div class="glass-card px-3 py-2">
-                                    <span class="font-serif text-lg font-bold" style="color: var(--color-spa-pink)">
+                                    <span class="font-serif text-lg font-bold" style="color: var(--color-gold)">
                                         {{ formatPrice(product.price) }}
                                     </span>
                                 </div>
@@ -152,7 +152,7 @@ const productImages: Record<number, string> = {
                             <Link
                                 href="/contacto"
                                 class="mt-5 flex items-center justify-center gap-2 rounded-xl border-2 border-transparent px-4 py-3 text-sm font-semibold text-cream transition-all hover:border-silver/30 hover:scale-105"
-                                style="background: linear-gradient(135deg, var(--color-spa-lavender) 0%, var(--color-spa-pink) 100%); opacity: 0.9;"
+                                style="background: linear-gradient(135deg, var(--color-silver) 0%, var(--color-gold) 100%); opacity: 0.9;"
                             >
                                 <ShoppingBag class="h-4 w-4" />
                                 Consultar disponibilidad
@@ -175,7 +175,7 @@ const productImages: Record<number, string> = {
     <!-- CTA FINAL -->
     <section class="relative overflow-hidden bg-gradient-dark py-20 lg:py-28">
         <div class="pointer-events-none absolute inset-0">
-            <div class="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" style="background: var(--color-spa-pink); opacity: 0.08;"></div>
+            <div class="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" style="background: var(--color-gold); opacity: 0.1;"></div>
         </div>
 
         <div class="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">

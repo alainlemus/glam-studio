@@ -637,7 +637,7 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                                 <!-- Tarde -->
                                 <div v-if="categorizedSlots.afternoon.length > 0" class="animate-fade-in animation-delay-100">
                                     <div class="mb-3 flex items-center gap-2">
-                                        <svg class="h-5 w-5" style="color: var(--color-spa-pink)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="h-5 w-5" style="color: var(--color-gold)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                                         </svg>
                                         <h3 class="text-sm font-semibold uppercase tracking-wider text-silver">Tarde</h3>
@@ -668,7 +668,7 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                                 <!-- Noche -->
                                 <div v-if="categorizedSlots.evening.length > 0" class="animate-fade-in animation-delay-200">
                                     <div class="mb-3 flex items-center gap-2">
-                                        <svg class="h-5 w-5" style="color: var(--color-spa-soft-pink)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="h-5 w-5" style="color: var(--color-silver-bright)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                                         </svg>
                                         <h3 class="text-sm font-semibold uppercase tracking-wider text-silver">Noche</h3>
@@ -729,7 +729,7 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                                 </div>
                                 <div class="mt-4 border-t border-smoke pt-3 flex items-center justify-between">
                                     <span class="font-serif text-base font-medium text-cream">Total</span>
-                                    <span class="font-serif text-2xl font-semibold" style="color: var(--color-spa-pink)">
+                                    <span class="font-serif text-2xl font-semibold" style="color: var(--color-gold)">
                                         {{ formatPrice(selectedService.price) }}
                                     </span>
                                 </div>
@@ -743,7 +743,7 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                                         src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80"
                                         alt="Cliente satisfecha"
                                         class="h-12 w-12 rounded-full object-cover ring-2"
-                                        style="--tw-ring-color: var(--color-spa-soft-pink)"
+                                        style="--tw-ring-color: var(--color-silver-bright)"
                                     />
                                     <div class="flex-1">
                                         <div class="mb-2 flex items-center gap-1">

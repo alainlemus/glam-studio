@@ -48,7 +48,7 @@ const branchImages: Record<number, string> = {
             </div>
 
             <h1 class="mt-3 font-serif text-5xl font-bold tracking-tight text-cream lg:text-6xl">
-                Nuestras <span class="italic" style="color: var(--color-spa-pink)">sucursales</span>
+                Nuestras <span class="italic" style="color: var(--color-silver-bright)">sucursales</span>
             </h1>
             <p class="mt-6 max-w-2xl mx-auto text-lg text-pearl">
                 Encuentra el salón más cercano a ti. Cada ubicación cuenta con estilistas profesionales y las mejores instalaciones.
@@ -117,7 +117,7 @@ const branchImages: Record<number, string> = {
                                     <span>{{ branch.address }}</span>
                                 </div>
                                 <div class="flex items-center gap-2.5">
-                                    <Phone class="h-4 w-4 shrink-0" style="color: var(--color-spa-pink)" />
+                                    <Phone class="h-4 w-4 shrink-0" style="color: var(--color-gold)" />
                                     <span>{{ branch.phone }}</span>
                                 </div>
                             </div>
@@ -131,7 +131,7 @@ const branchImages: Record<number, string> = {
                             </div>
 
                             <!-- Botón Ver detalles -->
-                            <div class="mt-4 rounded-xl border-2 border-transparent bg-gradient-to-r px-4 py-2.5 text-center text-sm font-semibold text-cream transition-all group-hover:border-silver/30 group-hover:scale-105" style="background: linear-gradient(135deg, var(--color-spa-lavender) 0%, var(--color-spa-pink) 100%); opacity: 0.9;">
+                            <div class="mt-4 rounded-xl border-2 border-transparent bg-gradient-to-r px-4 py-2.5 text-center text-sm font-semibold text-cream transition-all group-hover:border-silver/30 group-hover:scale-105" style="background: linear-gradient(135deg, var(--color-silver) 0%, var(--color-gold) 100%); opacity: 0.9;">
                                 Ver detalles →
                             </div>
                         </div>
@@ -147,7 +147,7 @@ const branchImages: Record<number, string> = {
             <div class="mb-12 text-center">
                 <p class="text-eyebrow">Ambientes únicos</p>
                 <h2 class="mt-3 font-serif text-4xl font-bold lg:text-5xl">
-                    Visita nuestros <span class="italic" style="color: var(--color-spa-pink)">espacios</span>
+                    Visita nuestros <span class="italic" style="color: var(--color-silver-bright)">espacios</span>
                 </h2>
             </div>
 
