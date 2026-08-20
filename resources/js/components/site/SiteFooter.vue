@@ -57,7 +57,6 @@ const branches = computed(() => (site.value?.branches as any[]) || []);
                     <ul class="mt-5 space-y-3 text-sm">
                         <li><a href="/nosotros" class="text-pearl transition hover:text-silver-bright">Nosotros</a></li>
                         <li><a href="/contacto" class="text-pearl transition hover:text-silver-bright">Contacto</a></li>
-                        <li><a href="/admin" class="text-pearl transition hover:text-silver-bright">Administración</a></li>
                     </ul>
                 </div>
 

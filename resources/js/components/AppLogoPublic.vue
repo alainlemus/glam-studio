@@ -19,7 +19,7 @@ const sizeMap = {
         <!-- Logo principal con corona -->
         <div :class="['relative shrink-0', sizeMap[size].wrap, sizeMap[size].wrap]">
             <img
-                src="/images/logo.jpg"
+                src="/images/logo.png"
                 alt="AM Glam Studio"
                 class="relative h-full w-full object-contain filter-glitter animate-fade-in"
             />

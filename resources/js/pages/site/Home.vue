@@ -48,7 +48,7 @@ const branchImages: Record<number, string> = {
     3: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80',
     4: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&q=80',
     5: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&q=80',
-    6: 'https://images.unsplash.com/photo-1595475038663-8d9f14b0eb7e?w=800&q=80',
+    6: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=800&q=80',
 };
 </script>
 
@@ -147,7 +147,7 @@ const branchImages: Record<number, string> = {
                                     <div class="flex -space-x-2">
                                         <img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=100&q=80" class="h-10 w-10 rounded-full object-cover ring-2 ring-ink" alt="Stylist 1" />
                                         <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=100&q=80" class="h-10 w-10 rounded-full object-cover ring-2 ring-ink" alt="Stylist 2" />
-                                        <img src="https://images.unsplash.com/photo-1595475038663-8d9f14b0eb7e?w=100&q=80" class="h-10 w-10 rounded-full object-cover ring-2 ring-ink" alt="Stylist 3" />
+                                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" class="h-10 w-10 rounded-full object-cover ring-2 ring-ink" alt="Stylist 3" />
                                     </div>
                                     <div class="flex-1">
                                         <p class="text-sm font-semibold text-cream">+12 Estilistas Certificados</p>
@@ -211,7 +211,7 @@ const branchImages: Record<number, string> = {
                 <!-- Transformación 3 -->
                 <div class="group relative overflow-hidden rounded-2xl aspect-[3/4] animate-fade-in animation-delay-200">
                     <img
-                        src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=600&q=80"
+                        src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&q=80"
                         alt="Transformation 3"
                         class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />

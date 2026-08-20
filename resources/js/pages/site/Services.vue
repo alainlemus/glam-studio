@@ -21,7 +21,7 @@ const categoryImages: Record<number, string> = {
     4: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=1200&q=80',
     5: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&q=80',
     6: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1200&q=80',
-    7: 'https://images.unsplash.com/photo-1595475038663-8d9f14b0eb7e?w=1200&q=80',
+    7: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=1200&q=80',
     8: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=1200&q=80',
 };
 

@@ -17,7 +17,7 @@ const branchImages: Record<number, string> = {
     3: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80',
     4: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&q=80',
     5: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&q=80',
-    6: 'https://images.unsplash.com/photo-1595475038663-8d9f14b0eb7e?w=800&q=80',
+    6: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=800&q=80',
 };
 </script>
 

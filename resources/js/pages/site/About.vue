@@ -183,7 +183,7 @@ defineProps<{
                 <div class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in animation-delay-200">
                     <div class="relative aspect-[3/4] overflow-hidden">
                         <img
-                            src="https://images.unsplash.com/photo-1595475038663-8d9f14b0eb7e?w=400&q=80"
+                            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"
                             alt="Stylist 3"
                             class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />

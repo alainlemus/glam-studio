@@ -671,6 +671,15 @@
         animation-duration: 1ms !important;
         animation-timing-function: linear !important;
     }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
 /* Soporte para navegadores sin View Transitions API */

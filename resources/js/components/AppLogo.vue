@@ -12,7 +12,7 @@ withDefaults(defineProps<{
         <!-- Imagen real del logo con corona y AM plateadas -->
         <div class="relative shrink-0" :class="variant === 'compact' ? 'h-12 w-12' : 'h-16 w-16'">
             <img
-                src="/images/logo.jpg"
+                src="/images/logo.png"
                 alt="AM Glam Studio"
                 class="relative h-full w-full object-contain"
             />

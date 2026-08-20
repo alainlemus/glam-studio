@@ -3,6 +3,17 @@ import { Head, router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import { useMotion } from '@vueuse/motion';
 import SiteLayout from '@/layouts/site/SiteLayout.vue';
+import {
+    Sparkles,
+    MapPin,
+    AlertTriangle,
+    CalendarDays,
+    Frown,
+    Loader2,
+    ArrowLeft,
+    Check,
+    Lock,
+} from '@lucide/vue';
 
 defineOptions({ layout: SiteLayout });
 
@@ -178,7 +189,8 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
             <div class="inline-flex items-center gap-2 animate-blur-fade-in">
                 <span class="text-eyebrow">Agenda en línea</span>
                 <span class="chip glass-effect text-silver-bright">
-                    ✨ 100% Seguro
+                    <Sparkles class="h-3 w-3" aria-hidden="true" />
+                    100% Seguro
                 </span>
             </div>
 
@@ -395,8 +407,9 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                                             {{ branch.name }}
                                         </option>
                                     </select>
-                                    <p v-if="selectedBranch" class="mt-1.5 text-xs text-silver-bright">
-                                        📍 {{ selectedBranch.city?.name }}
+                                    <p v-if="selectedBranch" class="mt-1.5 flex items-center gap-1 text-xs text-silver-bright">
+                                        <MapPin class="h-3 w-3" aria-hidden="true" />
+                                        {{ selectedBranch.city?.name }}
                                     </p>
                                 </div>
                                 <div>
@@ -542,8 +555,9 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                                 required
                                 class="input-elegant disabled:opacity-40 disabled:cursor-not-allowed"
                             />
-                            <p v-if="!form.branch_id || !form.service_id" class="mt-2 text-xs text-amber-400">
-                                ⚠ Selecciona primero la sucursal y el servicio
+                            <p v-if="!form.branch_id || !form.service_id" class="mt-2 flex items-center gap-1 text-xs text-amber-400">
+                                <AlertTriangle class="h-3 w-3" aria-hidden="true" />
+                                Selecciona primero la sucursal y el servicio
                             </p>
                         </div>
 
@@ -558,7 +572,7 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                             </div>
 
                             <div v-if="!canShowSlots" class="rounded-xl border border-dashed border-smoke bg-graphite p-12 text-center transition-all duration-300 hover:border-silver/30">
-                                <div class="text-4xl animate-fade-in">📅</div>
+                                <CalendarDays class="mx-auto h-10 w-10 text-mercury animate-fade-in" aria-hidden="true" />
                                 <p class="mt-3 text-sm text-mercury animate-fade-in animation-delay-100">
                                     Selecciona la fecha para ver horarios disponibles
                                 </p>
@@ -586,13 +600,14 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                                         <div v-for="i in 6" :key="`skeleton-afternoon-${i}`" class="h-12 skeleton"></div>
                                     </div>
                                 </div>
-                                <div class="text-center mt-4">
-                                    <p class="text-sm text-mercury animate-pulse">✨ Buscando los mejores horarios para ti...</p>
+                                <div class="mt-4 flex items-center justify-center gap-1.5 text-center">
+                                    <Sparkles class="h-3.5 w-3.5 text-mercury animate-pulse" aria-hidden="true" />
+                                    <p class="text-sm text-mercury animate-pulse">Buscando los mejores horarios para ti...</p>
                                 </div>
                             </div>
 
                             <div v-else-if="slots.length === 0" class="rounded-xl border border-amber-500/20 bg-amber-500/5 p-8 text-center transition-all duration-300 hover:border-amber-500/30">
-                                <div class="text-4xl animate-scale-in">😔</div>
+                                <Frown class="mx-auto h-10 w-10 text-amber-400 animate-scale-in" aria-hidden="true" />
                                 <p class="mt-3 text-sm font-medium text-amber-400 animate-fade-in animation-delay-100">
                                     No hay horarios disponibles
                                 </p>
@@ -766,16 +781,35 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                             :disabled="!canSubmit || submitting"
                             class="btn-primary-elegant mt-6 h-14 w-full text-base shadow-gold-lg disabled:shadow-none"
                         >
-                            <span v-if="submitting">⏳ Reservando…</span>
-                            <span v-else-if="!form.branch_id || !form.service_id">← Selecciona sucursal y servicio</span>
-                            <span v-else-if="!form.date">← Selecciona la fecha</span>
-                            <span v-else-if="!form.start_time">← Selecciona un horario</span>
-                            <span v-else-if="!form.name || !form.phone">← Completa tus datos</span>
-                            <span v-else>✓ Confirmar reserva</span>
+                            <span v-if="submitting" class="inline-flex items-center gap-2">
+                                <Loader2 class="h-4 w-4 animate-spin" aria-hidden="true" />
+                                Reservando…
+                            </span>
+                            <span v-else-if="!form.branch_id || !form.service_id" class="inline-flex items-center gap-2">
+                                <ArrowLeft class="h-4 w-4" aria-hidden="true" />
+                                Selecciona sucursal y servicio
+                            </span>
+                            <span v-else-if="!form.date" class="inline-flex items-center gap-2">
+                                <ArrowLeft class="h-4 w-4" aria-hidden="true" />
+                                Selecciona la fecha
+                            </span>
+                            <span v-else-if="!form.start_time" class="inline-flex items-center gap-2">
+                                <ArrowLeft class="h-4 w-4" aria-hidden="true" />
+                                Selecciona un horario
+                            </span>
+                            <span v-else-if="!form.name || !form.phone" class="inline-flex items-center gap-2">
+                                <ArrowLeft class="h-4 w-4" aria-hidden="true" />
+                                Completa tus datos
+                            </span>
+                            <span v-else class="inline-flex items-center gap-2">
+                                <Check class="h-4 w-4" aria-hidden="true" />
+                                Confirmar reserva
+                            </span>
                         </button>
 
-                        <p class="mt-3 text-center text-xs text-mercury">
-                            🔒 Tu información está segura · Sin spam
+                        <p class="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-mercury">
+                            <Lock class="h-3 w-3" aria-hidden="true" />
+                            Tu información está segura · Sin spam
                         </p>
                     </div>
                 </div>
