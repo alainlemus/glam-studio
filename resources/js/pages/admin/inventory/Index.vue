@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import { Plus, Search, Package, ChevronDown, AlertTriangle, DollarSign } from '@lucide/vue';
+import { Plus, Search, Package, ChevronDown, AlertTriangle, DollarSign, Minus } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 defineOptions({ layout: AppLayout });
 
@@ -26,13 +33,25 @@ const filter = () => {
     }, { preserveState: true });
 };
 
-const adjust = (productId: number, branchId: number) => {
-    const adj = prompt('Ajuste (+ añadir, - restar):');
-    if (adj === null) return;
-    const reason = prompt('Motivo:') || '';
-    router.post(`/admin/inventory/${productId}/${branchId}/adjust`, {
-        adjustment: parseInt(adj),
-        reason,
+const showAdjustModal = ref(false);
+const adjusting = ref<any>(null);
+const adjustment = ref(0);
+const adjustReason = ref('');
+
+const adjust = (stock: any) => {
+    adjusting.value = stock;
+    adjustment.value = 0;
+    adjustReason.value = '';
+    showAdjustModal.value = true;
+};
+
+const submitAdjust = () => {
+    if (!adjustment.value) return;
+    router.post(`/admin/inventory/${adjusting.value.product_id}/${adjusting.value.branch_id}/adjust`, {
+        adjustment: adjustment.value,
+        reason: adjustReason.value,
+    }, {
+        onSuccess: () => (showAdjustModal.value = false),
     });
 };
 </script>
@@ -71,6 +90,7 @@ const adjust = (productId: number, branchId: number) => {
         </div>
 
         <div class="overflow-hidden rounded-xl border border-smoke bg-card">
+            <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="border-b border-smoke bg-graphite">
                     <tr>
@@ -112,17 +132,54 @@ const adjust = (productId: number, branchId: number) => {
                             </span>
                         </td>
                         <td class="px-5 py-4 text-right">
-                            <button @click="adjust(stock.product_id, stock.branch_id)" class="text-sm font-medium text-silver-bright hover:text-silver-bright-bright">
+                            <button @click="adjust(stock)" class="text-sm font-medium text-silver-bright hover:text-silver-bright-bright">
                                 Ajustar
                             </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
 
         <div v-if="stocks.last_page > 1" class="flex justify-center gap-2">
             <Link v-for="link in stocks.links" :key="link.label" :href="link.url || '#'" :class="['flex h-11 items-center justify-center rounded-lg border px-4 text-sm transition', link.active ? 'border-silver bg-silver-bright text-ink font-semibold' : 'border-smoke bg-graphite text-pearl hover:border-silver/40']" v-html="link.label" />
         </div>
+
+        <Dialog v-model:open="showAdjustModal">
+            <DialogContent class="border-smoke bg-card sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle class="font-serif text-xl font-medium text-cream">Ajustar inventario</DialogTitle>
+                    <DialogDescription class="pt-1 text-sm text-mercury">
+                        {{ adjusting?.product?.name }} · {{ adjusting?.branch?.name }} · Stock actual: <span class="text-cream font-medium">{{ adjusting?.stock }}</span>
+                    </DialogDescription>
+                </DialogHeader>
+                <div class="space-y-3">
+                    <div>
+                        <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">Ajuste</label>
+                        <div class="flex items-center gap-2">
+                            <button type="button" class="btn-ghost-elegant h-11 w-11 shrink-0 px-0" @click="adjustment--">
+                                <Minus class="h-4 w-4" />
+                            </button>
+                            <input v-model.number="adjustment" type="number" class="input-elegant text-center" />
+                            <button type="button" class="btn-ghost-elegant h-11 w-11 shrink-0 px-0" @click="adjustment++">
+                                <Plus class="h-4 w-4" />
+                            </button>
+                        </div>
+                        <p class="mt-1.5 text-xs text-mercury">Positivo para añadir stock, negativo para restar.</p>
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">Motivo</label>
+                        <input v-model="adjustReason" placeholder="Ej. Conteo físico, merma, traspaso..." class="input-elegant" />
+                    </div>
+                </div>
+                <div class="mt-2 flex justify-end gap-3">
+                    <button type="button" class="btn-ghost-elegant h-11 px-6" @click="showAdjustModal = false">Cancelar</button>
+                    <button type="button" :disabled="!adjustment" class="btn-primary-elegant h-11 px-6 disabled:opacity-50" @click="submitAdjust">
+                        Aplicar ajuste
+                    </button>
+                </div>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>

@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             StylistScheduleSeeder::class,
             AppointmentSeeder::class,
             MarketingCampaignSeeder::class,
+            TestimonialSeeder::class,
         ]);
     }
 }

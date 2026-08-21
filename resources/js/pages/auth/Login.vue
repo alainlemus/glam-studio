@@ -1,20 +1,17 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { LogIn } from '@lucide/vue';
 import InputError from '@/components/InputError.vue';
 import PasskeyVerify from '@/components/PasskeyVerify.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/login';
 
 defineOptions({
     layout: {
-        title: 'Log in to your account',
-        description: 'Enter your email and password below to log in',
+        title: 'Bienvenida de nuevo',
+        description: 'Ingresa tu correo y contraseña para continuar',
     },
 });
 
@@ -25,11 +22,11 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head title="Iniciar sesión" />
 
     <div
         v-if="status"
-        class="mb-4 text-center text-sm font-medium text-green-600"
+        class="mb-4 text-center text-sm font-medium text-emerald-400"
     >
         {{ status }}
     </div>
@@ -40,69 +37,63 @@ defineProps<{
         v-bind="store.form()"
         :reset-on-success="['password']"
         v-slot="{ errors, processing }"
-        class="flex flex-col gap-6"
+        class="flex flex-col gap-5"
     >
-        <div class="grid gap-6">
-            <div class="grid gap-2">
-                <Label for="email">Email address</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    name="email"
-                    required
-                    autofocus
-                    :tabindex="1"
-                    autocomplete="email"
-                    placeholder="email@example.com"
-                />
-                <InputError :message="errors.email" />
-            </div>
-
-            <div class="grid gap-2">
-                <div class="flex items-center justify-between">
-                    <Label for="password">Password</Label>
-                    <TextLink
-                        v-if="canResetPassword"
-                        href="/forgot-password"
-                        class="text-sm"
-                        :tabindex="5"
-                    >
-                        Forgot your password?
-                    </TextLink>
-                </div>
-                <PasswordInput
-                    id="password"
-                    name="password"
-                    required
-                    :tabindex="2"
-                    autocomplete="current-password"
-                    placeholder="Password"
-                />
-                <InputError :message="errors.password" />
-            </div>
-
-            <div class="flex items-center justify-between">
-                <Label for="remember" class="flex items-center space-x-3">
-                    <Checkbox id="remember" name="remember" :tabindex="3" />
-                    <span>Remember me</span>
-                </Label>
-            </div>
-
-            <Button
-                type="submit"
-                class="mt-4 w-full"
-                :tabindex="4"
-                :disabled="processing"
-                data-test="login-button"
-            >
-                <Spinner v-if="processing" />
-                Log in
-            </Button>
+        <div>
+            <label for="email" class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">Correo electrónico</label>
+            <input
+                id="email"
+                type="email"
+                name="email"
+                required
+                autofocus
+                :tabindex="1"
+                autocomplete="email"
+                placeholder="correo@ejemplo.com"
+                class="input-elegant"
+            />
+            <InputError class="mt-1.5" :message="errors.email" />
         </div>
 
-        <div class="text-center text-sm text-muted-foreground">
-            Don't have an account?
-            <TextLink href="/register" :tabindex="5">Sign up</TextLink>
+        <div>
+            <div class="mb-1.5 flex items-center justify-between">
+                <label for="password" class="text-xs font-medium uppercase tracking-wider text-mercury">Contraseña</label>
+                <TextLink
+                    v-if="canResetPassword"
+                    href="/forgot-password"
+                    class="text-xs text-silver-bright hover:text-cream"
+                    :tabindex="5"
+                >
+                    ¿Olvidaste tu contraseña?
+                </TextLink>
+            </div>
+            <PasswordInput
+                id="password"
+                name="password"
+                required
+                :tabindex="2"
+                autocomplete="current-password"
+                placeholder="Contraseña"
+                class="input-elegant"
+            />
+            <InputError class="mt-1.5" :message="errors.password" />
         </div>
+
+        <label for="remember" class="inline-flex w-fit items-center gap-2.5 text-sm text-pearl">
+            <input id="remember" name="remember" type="checkbox" :tabindex="3" class="h-4 w-4 rounded border-smoke bg-graphite text-silver focus:ring-silver focus:ring-offset-0" />
+            Recordarme
+        </label>
+
+        <button
+            type="submit"
+            class="btn-primary-elegant mt-1 h-12 w-full text-sm"
+            :tabindex="4"
+            :disabled="processing"
+            data-test="login-button"
+        >
+            <Spinner v-if="processing" />
+            <LogIn v-else class="h-4 w-4" />
+            Iniciar sesión
+        </button>
     </Form>
 </template>

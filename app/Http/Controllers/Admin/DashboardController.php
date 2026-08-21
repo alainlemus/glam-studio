@@ -28,7 +28,7 @@ class DashboardController extends Controller
         $endOfLastMonth = Carbon::now()->subMonth()->endOfMonth();
 
         $user = $request->user();
-        $branchFilter = $user->isAdmin() || $user->isManager() ? null : $user->branch_id;
+        $branchFilter = $user->branchScope();
 
         // Métricas principales
         $appointmentsToday = Appointment::query()

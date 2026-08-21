@@ -13,7 +13,10 @@ class IncomeController extends Controller
 {
     public function index(Request $request): Response
     {
+        $branchScope = $request->user()->branchScope();
+
         $incomes = Income::with(['branch', 'sale'])
+            ->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))
             ->when($request->filled('from'), fn($q) => $q->whereDate('income_date', '>=', $request->from))
             ->when($request->filled('to'), fn($q) => $q->whereDate('income_date', '<=', $request->to))
             ->latest('income_date')
@@ -24,14 +27,18 @@ class IncomeController extends Controller
             'incomes' => $incomes,
             'filters' => $request->only(['from', 'to']),
             'total' => Income::query()
+                ->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))
                 ->when($request->filled('from'), fn($q) => $q->whereDate('income_date', '>=', $request->from))
                 ->when($request->filled('to'), fn($q) => $q->whereDate('income_date', '<=', $request->to))
                 ->sum('amount'),
         ]);
     }
 
-    public function destroy(Income $income): RedirectResponse
+    public function destroy(Request $request, Income $income): RedirectResponse
     {
+        $branchScope = $request->user()->branchScope();
+        abort_if($branchScope && $income->branch_id !== $branchScope, 403);
+
         $income->delete();
         return back()->with('success', 'Ingreso eliminado.');
     }

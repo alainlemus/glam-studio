@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { confirmDialog } from '@/composables/useConfirm';
 
 defineOptions({ layout: AppLayout });
 
@@ -16,41 +17,46 @@ const submit = () => {
     });
 };
 
-const destroy = (id: number) => {
-    if (confirm('¿Eliminar?')) router.delete(`/admin/expense-categories/${id}`);
+const destroy = async (id: number) => {
+    if (await confirmDialog({
+        title: '¿Eliminar esta categoría?',
+        variant: 'destructive',
+        confirmText: 'Eliminar',
+    })) router.delete(`/admin/expense-categories/${id}`);
 };
 </script>
 
 <template>
     <Head title="Categorías de egresos" />
 
-    <div class="space-y-6">
+    <div class="space-y-6 p-4 lg:p-8">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Categorías de Egresos</h1>
+            <p class="text-eyebrow">Finanzas</p>
+            <h2 class="mt-1 font-serif text-3xl font-medium tracking-tight">Categorías de egresos</h2>
         </div>
 
-        <form @submit.prevent="submit" class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <form @submit.prevent="submit" class="card-elegant p-4">
             <div class="flex flex-wrap gap-3">
-                <input v-model="form.name" required placeholder="Nombre" class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm" />
-                <select v-model="form.type" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
+                <input v-model="form.name" required placeholder="Nombre" class="input-elegant min-w-[160px] flex-1" />
+                <select v-model="form.type" class="input-elegant w-auto">
                     <option value="fixed">Fijo</option>
                     <option value="variable">Variable</option>
                 </select>
-                <input v-model="form.description" placeholder="Descripción" class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm" />
-                <button type="submit" class="rounded-lg bg-pink-600 px-4 py-2 text-sm font-medium text-white">Agregar</button>
+                <input v-model="form.description" placeholder="Descripción" class="input-elegant min-w-[160px] flex-1" />
+                <button type="submit" class="btn-primary-elegant h-11 px-5 text-sm">Agregar</button>
             </div>
         </form>
 
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div v-for="cat in categories" :key="cat.id" class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div v-for="cat in categories" :key="cat.id" class="card-elegant p-4">
                 <div class="flex items-center justify-between">
-                    <div class="font-semibold text-gray-900">{{ cat.name }}</div>
-                    <span :class="['rounded-full px-2 py-0.5 text-xs', cat.type === 'fixed' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700']">
-                        {{ cat.type }}
+                    <div class="font-semibold text-cream">{{ cat.name }}</div>
+                    <span :class="['chip', cat.type === 'fixed' ? 'bg-blue-500/15 text-blue-400' : 'bg-amber-500/15 text-amber-400']">
+                        {{ cat.type === 'fixed' ? 'Fijo' : 'Variable' }}
                     </span>
                 </div>
-                <div v-if="cat.description" class="mt-1 text-xs text-gray-500">{{ cat.description }}</div>
-                <button @click="destroy(cat.id)" class="mt-2 text-xs text-red-600">Eliminar</button>
+                <div v-if="cat.description" class="mt-1 text-xs text-mercury">{{ cat.description }}</div>
+                <button @click="destroy(cat.id)" class="mt-2 text-xs font-medium text-red-400 hover:text-red-300">Eliminar</button>
             </div>
         </div>
     </div>

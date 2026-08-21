@@ -21,6 +21,9 @@ const props = defineProps<{
     branches: any[];
     services: any[];
     categories: any[];
+    testimonial: any | null;
+    reviewStats: { count: number; average: number };
+    appointmentsThisMonth: number;
     preselected: { branch_id?: any; service_id?: any };
 }>();
 
@@ -58,6 +61,7 @@ const canShowSlots = computed(() => {
 const canSubmit = computed(() => {
     return form.value.name &&
         form.value.phone &&
+        form.value.email &&
         form.value.branch_id &&
         form.value.service_id &&
         form.value.date &&
@@ -227,14 +231,14 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                         <div class="h-8 w-8 rounded-full bg-gradient-to-br from-gold to-gold-dark border-2 border-ink"></div>
                         <div class="h-8 w-8 rounded-full bg-gradient-to-br from-silver-bright to-silver border-2 border-ink"></div>
                     </div>
-                    <span class="text-cream font-medium">+234 citas este mes</span>
+                    <span class="text-cream font-medium">+{{ appointmentsThisMonth }} citas este mes</span>
                 </div>
-                <div class="flex items-center gap-1.5 glass-effect px-4 py-2 rounded-full">
+                <div v-if="reviewStats.count > 0" class="flex items-center gap-1.5 glass-effect px-4 py-2 rounded-full">
                     <svg class="h-5 w-5 text-gold-bright fill-current" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                     </svg>
-                    <span class="text-cream font-medium">4.9/5</span>
-                    <span class="text-mercury">(1,203 reseñas)</span>
+                    <span class="text-cream font-medium">{{ reviewStats.average }}/5</span>
+                    <span class="text-mercury">({{ reviewStats.count }} {{ reviewStats.count === 1 ? 'reseña' : 'reseñas' }})</span>
                 </div>
             </div>
         </div>
@@ -378,13 +382,15 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                                     />
                                 </div>
                                 <div>
-                                    <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">Email (opcional)</label>
+                                    <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">Correo electrónico *</label>
                                     <input
                                         v-model="form.email"
                                         type="email"
+                                        required
                                         class="input-elegant"
                                         placeholder="tu@email.com"
                                     />
+                                    <p class="mt-1.5 text-xs text-mercury">Te enviaremos la confirmación de tu cita a este correo.</p>
                                 </div>
                             </div>
                         </div>
@@ -752,24 +758,28 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                             </div>
 
                             <!-- Testimonial con foto - Glass card -->
-                            <div class="overflow-hidden rounded-xl glass-card p-4 animate-fade-in">
+                            <div v-if="testimonial" class="overflow-hidden rounded-xl glass-card p-4 animate-fade-in">
                                 <div class="flex items-start gap-3">
                                     <img
-                                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80"
-                                        alt="Cliente satisfecha"
+                                        v-if="testimonial.photo_url"
+                                        :src="testimonial.photo_url"
+                                        :alt="testimonial.client_name"
                                         class="h-12 w-12 rounded-full object-cover ring-2"
                                         style="--tw-ring-color: var(--color-silver-bright)"
                                     />
+                                    <div v-else class="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-silver to-silver-dark text-sm font-semibold text-ink ring-2" style="--tw-ring-color: var(--color-silver-bright)">
+                                        {{ testimonial.client_name?.charAt(0) }}
+                                    </div>
                                     <div class="flex-1">
                                         <div class="mb-2 flex items-center gap-1">
-                                            <svg v-for="i in 5" :key="i" class="h-3 w-3 text-gold-bright fill-current" viewBox="0 0 20 20">
+                                            <svg v-for="i in 5" :key="i" class="h-3 w-3 fill-current" :class="i <= testimonial.rating ? 'text-gold-bright' : 'text-smoke'" viewBox="0 0 20 20">
                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                             </svg>
                                         </div>
                                         <p class="text-xs leading-relaxed text-mercury italic">
-                                            "El mejor salón que he visitado. El resultado superó mis expectativas. ¡100% recomendado!"
+                                            "{{ testimonial.quote }}"
                                         </p>
-                                        <p class="mt-2 text-xs font-medium text-silver">— María G.</p>
+                                        <p class="mt-2 text-xs font-medium text-silver">— {{ testimonial.client_name }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -797,7 +807,7 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
                                 <ArrowLeft class="h-4 w-4" aria-hidden="true" />
                                 Selecciona un horario
                             </span>
-                            <span v-else-if="!form.name || !form.phone" class="inline-flex items-center gap-2">
+                            <span v-else-if="!form.name || !form.phone || !form.email" class="inline-flex items-center gap-2">
                                 <ArrowLeft class="h-4 w-4" aria-hidden="true" />
                                 Completa tus datos
                             </span>

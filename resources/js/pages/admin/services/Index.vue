@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { Plus, Search, Clock, DollarSign, ChevronDown } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { confirmDialog } from '@/composables/useConfirm';
 
 defineOptions({ layout: AppLayout });
 
@@ -24,8 +25,13 @@ const filter = () => {
     }, { preserveState: true });
 };
 
-const destroy = (id: number) => {
-    if (confirm('¿Eliminar este servicio?')) router.delete(`/admin/services/${id}`);
+const destroy = async (id: number) => {
+    if (await confirmDialog({
+        title: '¿Eliminar este servicio?',
+        description: 'Esta acción no se puede deshacer.',
+        variant: 'destructive',
+        confirmText: 'Eliminar',
+    })) router.delete(`/admin/services/${id}`);
 };
 </script>
 
@@ -62,6 +68,7 @@ const destroy = (id: number) => {
         </div>
 
         <div class="overflow-hidden rounded-xl border border-smoke bg-card">
+            <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="border-b border-smoke bg-graphite">
                     <tr>
@@ -104,6 +111,7 @@ const destroy = (id: number) => {
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
 
         <div v-if="services.last_page > 1" class="flex justify-center gap-2">

@@ -19,7 +19,7 @@ class FinanceController extends Controller
         $from = $request->filled('from') ? Carbon::parse($request->from) : Carbon::now()->startOfMonth();
         $to = $request->filled('to') ? Carbon::parse($request->to) : Carbon::now();
 
-        $branchId = $request->branch_id;
+        $branchId = $request->user()->branchScope() ?: $request->branch_id;
 
         $totalIncome = Income::when($branchId, fn($q) => $q->where('branch_id', $branchId))
             ->whereBetween('income_date', [$from, $to])
@@ -71,7 +71,7 @@ class FinanceController extends Controller
             ],
             'expensesByCategory' => $expensesByCategory,
             'dailyData' => $dailyData,
-            'branches' => Branch::active()->orderBy('name')->get(),
+            'branches' => Branch::active()->when($request->user()->branchScope(), fn($q) => $q->where('id', $branchId))->orderBy('name')->get(),
             'filters' => [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),

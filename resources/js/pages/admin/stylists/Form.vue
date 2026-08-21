@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 defineOptions({ layout: AppLayout });
 
 const props = defineProps<{
+    stylist?: any;
     branches: any[];
 }>();
 
@@ -18,39 +19,46 @@ const days = [
     { value: 6, label: 'Sábado' },
 ];
 
-const defaultSchedules = days.map(d => ({
-    day_of_week: d.value,
-    start_time: '09:00',
-    end_time: '19:00',
-    active: true,
-}));
-
-const form = useForm({
-    name: '',
-    email: '',
-    phone: '',
-    password: '',
-    branch_id: '',
-    specialty: '',
-    bio: '',
-    base_salary: 8000,
-    service_commission: 25,
-    product_commission: 10,
-    is_active: true,
-    schedules: defaultSchedules,
+const buildSchedules = () => days.map(d => {
+    const existing = props.stylist?.schedules?.find((s: any) => s.day_of_week === d.value);
+    return {
+        day_of_week: d.value,
+        start_time: existing?.start_time?.slice(0, 5) || '09:00',
+        end_time: existing?.end_time?.slice(0, 5) || '19:00',
+        active: existing ? existing.is_active : !props.stylist,
+    };
 });
 
-const submit = () => form.post('/admin/stylists');
+const form = useForm({
+    name: props.stylist?.user?.name || '',
+    email: props.stylist?.user?.email || '',
+    phone: props.stylist?.user?.phone || '',
+    password: '',
+    password_confirmation: '',
+    branch_id: props.stylist?.branch_id || '',
+    specialty: props.stylist?.specialty || '',
+    bio: props.stylist?.bio || '',
+    base_salary: props.stylist?.base_salary ?? 8000,
+    service_commission: props.stylist?.service_commission ?? 25,
+    product_commission: props.stylist?.product_commission ?? 10,
+    is_active: props.stylist?.is_active ?? true,
+    schedules: buildSchedules(),
+});
+
+const submit = () => {
+    if (props.stylist) form.put(`/admin/stylists/${props.stylist.id}`);
+    else form.post('/admin/stylists');
+};
 </script>
 
 <template>
-    <Head title="Nuevo estilista" />
+    <Head :title="stylist ? 'Editar estilista' : 'Nuevo estilista'" />
 
     <div class="mx-auto max-w-3xl space-y-6 p-4 lg:p-8">
         <div>
             <Link href="/admin/stylists" class="mb-2 inline-flex items-center gap-1 text-sm text-mercury hover:text-silver-bright">← Volver</Link>
             <p class="text-eyebrow">Equipo</p>
-            <h2 class="mt-1 font-serif text-3xl font-medium tracking-tight">Nuevo estilista</h2>
+            <h2 class="mt-1 font-serif text-3xl font-medium tracking-tight">{{ stylist ? 'Editar' : 'Nuevo' }} estilista</h2>
         </div>
 
         <form @submit.prevent="submit" class="space-y-6">
@@ -70,8 +78,22 @@ const submit = () => form.post('/admin/stylists');
                         <input v-model="form.phone" class="input-elegant" />
                     </div>
                     <div>
-                        <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">Contraseña *</label>
-                        <input v-model="form.password" type="password" required minlength="6" class="input-elegant" />
+                        <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">
+                            {{ stylist ? 'Nueva contraseña' : 'Contraseña *' }}
+                        </label>
+                        <input
+                            v-model="form.password"
+                            type="password"
+                            :required="!stylist"
+                            minlength="8"
+                            class="input-elegant"
+                            :placeholder="stylist ? 'Dejar vacío para no cambiar' : ''"
+                        />
+                        <p v-if="form.errors.password" class="mt-1 text-xs text-red-400">{{ form.errors.password }}</p>
+                    </div>
+                    <div v-if="form.password">
+                        <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">Confirmar contraseña *</label>
+                        <input v-model="form.password_confirmation" type="password" required class="input-elegant" />
                     </div>
                     <div>
                         <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">Sucursal *</label>
@@ -126,7 +148,7 @@ const submit = () => form.post('/admin/stylists');
                 <Link href="/admin/stylists" class="btn-ghost-elegant h-12 px-6">Cancelar</Link>
                 <button type="submit" :disabled="form.processing" class="btn-primary-elegant h-12 px-7 disabled:opacity-50">
                     <Scissors class="h-4 w-4" />
-                    {{ form.processing ? 'Guardando...' : 'Crear estilista' }}
+                    {{ form.processing ? 'Guardando...' : (stylist ? 'Guardar cambios' : 'Crear estilista') }}
                 </button>
             </div>
         </form>

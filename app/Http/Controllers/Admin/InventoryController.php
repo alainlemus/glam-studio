@@ -15,8 +15,11 @@ class InventoryController extends Controller
 {
     public function index(Request $request): Response
     {
+        $branchScope = $request->user()->branchScope();
+
         $stocks = ProductStock::with(['product.category', 'branch'])
-            ->when($request->branch_id, fn($q) => $q->where('branch_id', $request->branch_id))
+            ->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))
+            ->when(!$branchScope && $request->branch_id, fn($q) => $q->where('branch_id', $request->branch_id))
             ->when($request->low_stock, fn($q) => $q->whereColumn('stock', '<=', 'min_stock'))
             ->when($request->search, fn($q) => $q->whereHas('product', fn($q2) =>
                 $q2->where('name', 'like', "%{$request->search}%")
@@ -27,13 +30,16 @@ class InventoryController extends Controller
 
         return Inertia::render('admin/inventory/Index', [
             'stocks' => $stocks,
-            'branches' => Branch::active()->orderBy('name')->get(),
+            'branches' => Branch::active()->when($branchScope, fn($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
             'filters' => $request->only(['search', 'branch_id', 'low_stock']),
         ]);
     }
 
     public function adjust(Request $request, Product $product, Branch $branch): RedirectResponse
     {
+        $branchScope = $request->user()->branchScope();
+        abort_if($branchScope && $branch->id !== $branchScope, 403);
+
         $validated = $request->validate([
             'adjustment' => 'required|integer',
             'reason' => 'nullable|string|max:255',
@@ -53,6 +59,8 @@ class InventoryController extends Controller
 
     public function transfer(Request $request): RedirectResponse
     {
+        abort_unless($request->user()->isAdmin(), 403, 'Solo un administrador puede transferir inventario entre sucursales.');
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'from_branch_id' => 'required|exists:branches,id',

@@ -7,6 +7,7 @@ import { Mail, Phone, MapPin, Sparkles } from '@lucide/vue';
 const page = usePage();
 const site = computed(() => page.props.site as any);
 const branches = computed(() => (site.value?.branches as any[]) || []);
+const settings = computed(() => site.value?.settings || {});
 </script>
 
 <template>
@@ -18,22 +19,22 @@ const branches = computed(() => (site.value?.branches as any[]) || []);
                 <div>
                     <AppLogoPublic size="md" />
                     <p class="mt-6 max-w-xs text-sm leading-relaxed text-mercury">
-                        Belleza, estilo y bienestar en cada visita. Tu salón de confianza.
+                        {{ settings.footer_description || 'Belleza, estilo y bienestar en cada visita. Tu salón de confianza.' }}
                     </p>
-                    <div class="mt-6 flex gap-3">
-                        <a href="#" aria-label="Instagram" class="flex h-10 w-10 items-center justify-center rounded-full border border-smoke bg-graphite text-pearl transition hover:border-silver hover:text-silver-bright">
+                    <div v-if="settings.instagram_url || settings.facebook_url || settings.tiktok_url" class="mt-6 flex gap-3">
+                        <a v-if="settings.instagram_url" :href="settings.instagram_url" target="_blank" rel="noopener" aria-label="Instagram" class="flex h-10 w-10 items-center justify-center rounded-full border border-smoke bg-graphite text-pearl transition hover:border-silver hover:text-silver-bright">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                                 <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
                                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
                                 <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
                             </svg>
                         </a>
-                        <a href="#" aria-label="Facebook" class="flex h-10 w-10 items-center justify-center rounded-full border border-smoke bg-graphite text-pearl transition hover:border-silver hover:text-silver-bright">
+                        <a v-if="settings.facebook_url" :href="settings.facebook_url" target="_blank" rel="noopener" aria-label="Facebook" class="flex h-10 w-10 items-center justify-center rounded-full border border-smoke bg-graphite text-pearl transition hover:border-silver hover:text-silver-bright">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                             </svg>
                         </a>
-                        <a href="#" aria-label="TikTok" class="flex h-10 w-10 items-center justify-center rounded-full border border-smoke bg-graphite text-pearl transition hover:border-silver hover:text-silver-bright">
+                        <a v-if="settings.tiktok_url" :href="settings.tiktok_url" target="_blank" rel="noopener" aria-label="TikTok" class="flex h-10 w-10 items-center justify-center rounded-full border border-smoke bg-graphite text-pearl transition hover:border-silver hover:text-silver-bright">
                             <svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
                                 <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.5a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.83 4.83 0 0 1-1.84-.93Z"/>
                             </svg>
@@ -57,6 +58,7 @@ const branches = computed(() => (site.value?.branches as any[]) || []);
                     <ul class="mt-5 space-y-3 text-sm">
                         <li><a href="/nosotros" class="text-pearl transition hover:text-silver-bright">Nosotros</a></li>
                         <li><a href="/contacto" class="text-pearl transition hover:text-silver-bright">Contacto</a></li>
+                        <li><a href="/aviso-de-privacidad" class="text-pearl transition hover:text-silver-bright">Aviso de privacidad</a></li>
                     </ul>
                 </div>
 
@@ -73,7 +75,7 @@ const branches = computed(() => (site.value?.branches as any[]) || []);
             </div>
 
             <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-smoke pt-8 text-xs text-mercury sm:flex-row">
-                <p>© {{ new Date().getFullYear() }} Glam Studio · Todos los derechos reservados</p>
+                <p>© {{ new Date().getFullYear() }} {{ settings.site_name || 'Glam Studio' }} · Todos los derechos reservados</p>
                 <div class="flex items-center gap-1.5 text-silver/60">
                     <Sparkles class="h-3 w-3" />
                     <span>Hecho con elegancia</span>

@@ -9,6 +9,7 @@ import {
 } from '@lucide/vue';
 import SiteFooter from '@/components/site/SiteFooter.vue';
 import AppLogoPublic from '@/components/AppLogoPublic.vue';
+import CookieConsentBanner from '@/components/site/CookieConsentBanner.vue';
 
 const props = defineProps<{
     variant?: 'transparent' | 'solid';
@@ -112,5 +113,6 @@ const isActive = (href: string) => {
         </main>
 
         <SiteFooter />
+        <CookieConsentBanner />
     </div>
 </template>

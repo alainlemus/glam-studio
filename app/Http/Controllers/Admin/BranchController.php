@@ -14,7 +14,10 @@ class BranchController extends Controller
 {
     public function index(Request $request): Response
     {
+        $branchScope = $request->user()->branchScope();
+
         $branches = Branch::with('city')
+            ->when($branchScope, fn($q) => $q->where('id', $branchScope))
             ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%")
                 ->orWhere('address', 'like', "%{$request->search}%"))
             ->when($request->city_id, fn($q) => $q->where('city_id', $request->city_id))
@@ -29,8 +32,10 @@ class BranchController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
+        abort_unless($request->user()->isAdmin(), 403, 'Solo un administrador puede crear sucursales.');
+
         return Inertia::render('admin/branches/Form', [
             'cities' => City::active()->orderBy('name')->get(),
         ]);
@@ -38,6 +43,8 @@ class BranchController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        abort_unless($request->user()->isAdmin(), 403, 'Solo un administrador puede crear sucursales.');
+
         $validated = $request->validate([
             'city_id' => 'required|exists:cities,id',
             'name' => 'required|string|max:255',
@@ -63,8 +70,10 @@ class BranchController extends Controller
         return redirect()->route('admin.branches.index')->with('success', 'Sucursal creada correctamente.');
     }
 
-    public function show(Branch $branch): Response
+    public function show(Request $request, Branch $branch): Response
     {
+        $this->authorizeBranch($request, $branch);
+
         $branch->load(['city', 'stylists.user', 'productStocks.product']);
 
         return Inertia::render('admin/branches/Show', [
@@ -72,8 +81,10 @@ class BranchController extends Controller
         ]);
     }
 
-    public function edit(Branch $branch): Response
+    public function edit(Request $request, Branch $branch): Response
     {
+        $this->authorizeBranch($request, $branch);
+
         return Inertia::render('admin/branches/Form', [
             'branch' => $branch,
             'cities' => City::active()->orderBy('name')->get(),
@@ -82,6 +93,8 @@ class BranchController extends Controller
 
     public function update(Request $request, Branch $branch): RedirectResponse
     {
+        $this->authorizeBranch($request, $branch);
+
         $validated = $request->validate([
             'city_id' => 'required|exists:cities,id',
             'name' => 'required|string|max:255',
@@ -106,9 +119,16 @@ class BranchController extends Controller
         return redirect()->route('admin.branches.index')->with('success', 'Sucursal actualizada.');
     }
 
-    public function destroy(Branch $branch): RedirectResponse
+    public function destroy(Request $request, Branch $branch): RedirectResponse
     {
+        abort_unless($request->user()->isAdmin(), 403, 'Solo un administrador puede eliminar sucursales.');
         $branch->delete();
         return redirect()->route('admin.branches.index')->with('success', 'Sucursal eliminada.');
+    }
+
+    private function authorizeBranch(Request $request, Branch $branch): void
+    {
+        $branchScope = $request->user()->branchScope();
+        abort_if($branchScope && $branch->id !== $branchScope, 403);
     }
 }

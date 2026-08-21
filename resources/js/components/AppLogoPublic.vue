@@ -1,9 +1,18 @@
 <script setup lang="ts">
+import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
 withDefaults(defineProps<{
     size?: 'sm' | 'md' | 'lg' | 'xl';
 }>(), {
     size: 'md',
 });
+
+const page = usePage();
+const settings = computed(() => (page.props.site as any)?.settings || {});
+const logoSrc = computed(() => settings.value.logo_url || '/images/logo.png');
+const siteName = computed(() => settings.value.site_name || 'Glam Studio');
+const tagline = computed(() => settings.value.tagline || 'Beauty & More');
 
 const sizeMap = {
     sm: { wrap: 'h-12', text: 'text-base', subtitle: 'text-[8px]', width: 'w-44' },
@@ -19,8 +28,8 @@ const sizeMap = {
         <!-- Logo principal con corona -->
         <div :class="['relative shrink-0', sizeMap[size].wrap, sizeMap[size].wrap]">
             <img
-                src="/images/logo.png"
-                alt="AM Glam Studio"
+                :src="logoSrc"
+                :alt="siteName"
                 class="relative h-full w-full object-contain filter-glitter animate-fade-in"
             />
             <!-- Destellos -->
@@ -31,10 +40,10 @@ const sizeMap = {
         <!-- Texto al lado -->
         <div class="flex flex-col leading-none" :class="sizeMap[size].width">
             <span :class="['font-serif italic font-semibold tracking-wide', sizeMap[size].text, 'text-glitter']">
-                Glam Studio
+                {{ siteName }}
             </span>
             <span :class="['mt-1 uppercase tracking-[0.3em] text-silver/80 font-medium', sizeMap[size].subtitle]">
-                Beauty & More
+                {{ tagline }}
             </span>
         </div>
     </div>

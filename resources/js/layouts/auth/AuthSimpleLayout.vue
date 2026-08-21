@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
 
 defineProps<{
     title?: string;
@@ -9,33 +8,40 @@ defineProps<{
 </script>
 
 <template>
-    <div
-        class="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10"
-    >
-        <div class="w-full max-w-sm">
+    <div class="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-ink p-6 md:p-10">
+        <!-- Mesh gradients decorativos -->
+        <div class="pointer-events-none absolute inset-0 opacity-40">
+            <div class="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-silver/10 blur-[120px]"></div>
+            <div class="absolute left-1/4 top-1/4 h-[400px] w-[400px] rounded-full" style="background: var(--color-spa-lavender); opacity: 0.08; filter: blur(100px);"></div>
+            <div class="absolute right-1/4 bottom-1/3 h-[450px] w-[450px] rounded-full" style="background: var(--color-gold); opacity: 0.08; filter: blur(110px);"></div>
+        </div>
+
+        <div class="relative w-full max-w-sm">
             <div class="flex flex-col gap-8">
                 <div class="flex flex-col items-center gap-4">
                     <Link
                         href="/"
-                        class="flex flex-col items-center gap-2 font-medium"
+                        class="flex flex-col items-center gap-3 font-medium transition-transform hover:scale-[1.03]"
                     >
-                        <div
-                            class="mb-1 flex h-9 w-9 items-center justify-center rounded-md"
-                        >
-                            <AppLogoIcon
-                                class="size-9 fill-current text-[var(--foreground)] dark:text-white"
+                        <div class="flex h-28 w-28 items-center justify-center">
+                            <img
+                                src="/images/logo.png"
+                                alt="Glam Studio"
+                                class="h-full w-full object-contain filter-glitter animate-fade-in"
                             />
                         </div>
                         <span class="sr-only">{{ title }}</span>
                     </Link>
-                    <div class="space-y-2 text-center">
-                        <h1 class="text-xl font-medium">{{ title }}</h1>
-                        <p class="text-center text-sm text-muted-foreground">
+                    <div class="space-y-1.5 text-center">
+                        <h1 class="font-serif text-2xl font-medium tracking-tight text-cream">{{ title }}</h1>
+                        <p class="text-center text-sm text-mercury">
                             {{ description }}
                         </p>
                     </div>
                 </div>
-                <slot />
+                <div class="glass-card rounded-2xl p-6 shadow-gold-lg sm:p-8">
+                    <slot />
+                </div>
             </div>
         </div>
     </div>

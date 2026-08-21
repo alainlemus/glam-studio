@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\SiteSetting;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -119,6 +120,16 @@ class SiteController extends Controller
 
         return Inertia::render('site/Products', [
             'categories' => $categories,
+        ]);
+    }
+
+    public function privacyPolicy(): Response
+    {
+        $settings = SiteSetting::current();
+
+        return Inertia::render('site/PrivacyPolicy', [
+            'content' => $settings->privacy_policy,
+            'updatedAt' => $settings->privacy_policy_updated_at,
         ]);
     }
 }

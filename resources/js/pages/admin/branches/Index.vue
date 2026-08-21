@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 import { Plus, Search, Building2, ChevronDown, MapPin, Phone } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { confirmDialog } from '@/composables/useConfirm';
 
 defineOptions({ layout: AppLayout });
 
@@ -11,6 +12,8 @@ const props = defineProps<{
     cities: any[];
     filters: any;
 }>();
+
+const isAdmin = computed(() => (usePage().props.auth as any)?.user?.role === 'admin');
 
 const search = ref(props.filters.search || '');
 const cityId = ref(props.filters.city_id || '');
@@ -22,8 +25,13 @@ const filter = () => {
     }, { preserveState: true });
 };
 
-const destroy = (id: number) => {
-    if (confirm('¿Eliminar esta sucursal?')) router.delete(`/admin/branches/${id}`);
+const destroy = async (id: number) => {
+    if (await confirmDialog({
+        title: '¿Eliminar esta sucursal?',
+        description: 'Esta acción no se puede deshacer.',
+        variant: 'destructive',
+        confirmText: 'Eliminar',
+    })) router.delete(`/admin/branches/${id}`);
 };
 </script>
 
@@ -37,7 +45,7 @@ const destroy = (id: number) => {
                 <h2 class="mt-1 font-serif text-3xl font-medium tracking-tight">Sucursales</h2>
                 <p class="mt-1 text-sm text-mercury">Gestiona todas las ubicaciones</p>
             </div>
-            <Link href="/admin/branches/create" class="btn-primary-elegant h-12 px-5 text-sm">
+            <Link v-if="isAdmin" href="/admin/branches/create" class="btn-primary-elegant h-12 px-5 text-sm">
                 <Plus class="h-4 w-4" />
                 Nueva sucursal
             </Link>
@@ -66,6 +74,7 @@ const destroy = (id: number) => {
         </div>
 
         <div class="overflow-hidden rounded-xl border border-smoke bg-card">
+            <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="border-b border-smoke bg-graphite">
                     <tr>
@@ -109,11 +118,12 @@ const destroy = (id: number) => {
                         </td>
                         <td class="px-5 py-4 text-right">
                             <Link :href="`/admin/branches/${branch.id}/edit`" class="text-sm font-medium text-silver-bright hover:text-silver-bright-bright">Editar</Link>
-                            <button @click="destroy(branch.id)" class="ml-3 text-sm font-medium text-red-400 hover:text-red-300">Eliminar</button>
+                            <button v-if="isAdmin" @click="destroy(branch.id)" class="ml-3 text-sm font-medium text-red-400 hover:text-red-300">Eliminar</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+            </div>
             <div v-if="branches.data.length === 0" class="px-6 py-16 text-center text-sm text-mercury">
                 No hay sucursales registradas
             </div>

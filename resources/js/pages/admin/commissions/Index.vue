@@ -9,6 +9,7 @@ import {
     TrendingUp,
 } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { confirmDialog } from '@/composables/useConfirm';
 
 defineOptions({ layout: AppLayout });
 
@@ -36,23 +37,32 @@ const filter = () => {
     }, { preserveState: true });
 };
 
-const payOne = (id: number) => {
-    if (confirm('¿Marcar comisión como pagada?')) router.post(`/admin/commissions/${id}/pay`);
+const payOne = async (id: number) => {
+    if (await confirmDialog({
+        title: '¿Marcar comisión como pagada?',
+        confirmText: 'Marcar como pagada',
+    })) router.post(`/admin/commissions/${id}/pay`);
 };
 
-const payBatch = () => {
-    if (!stylistId.value) {
-        alert('Selecciona un estilista para liquidar');
-        return;
+const payBatch = async () => {
+    const stylistName = stylists.find(s => s.id == stylistId.value)?.user?.name || 'este estilista';
+    const rangeFrom = from.value || '2000-01-01';
+    const rangeTo = to.value || new Date().toISOString().slice(0, 10);
+    const range = from.value && to.value
+        ? `del ${from.value} al ${to.value}`
+        : 'de todo su historial pendiente';
+
+    if (await confirmDialog({
+        title: '¿Liquidar comisiones pendientes?',
+        description: `Se marcarán como pagadas todas las comisiones pendientes de ${stylistName} ${range}.`,
+        confirmText: 'Liquidar',
+    })) {
+        router.post('/admin/commissions/pay-batch', {
+            stylist_id: stylistId.value,
+            from: rangeFrom,
+            to: rangeTo,
+        });
     }
-    const period = prompt('Período a liquidar (YYYY-MM-DD a YYYY-MM-DD):');
-    if (!period) return;
-    const [fromD, toD] = period.split(' a ');
-    router.post('/admin/commissions/pay-batch', {
-        stylist_id: stylistId.value,
-        from: fromD,
-        to: toD,
-    });
 };
 
 const maxTotal = computed => Math.max(1, ...(props.byStylist || []).map(r => Number(r.total) || 0));
@@ -128,6 +138,7 @@ const maxTotal = computed => Math.max(1, ...(props.byStylist || []).map(r => Num
         </div>
 
         <div class="overflow-hidden rounded-xl border border-smoke bg-card">
+            <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="border-b border-smoke bg-graphite">
                     <tr>
@@ -172,6 +183,7 @@ const maxTotal = computed => Math.max(1, ...(props.byStylist || []).map(r => Num
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
 
         <div v-if="commissions.last_page > 1" class="flex justify-center gap-2">

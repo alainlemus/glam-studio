@@ -21,6 +21,8 @@ class SaleController extends Controller
 {
     public function index(Request $request): Response
     {
+        $branchScope = $request->user()->branchScope();
+
         $query = Sale::with(['client', 'branch', 'stylist.user', 'user', 'items']);
 
         if ($request->filled('from')) {
@@ -29,7 +31,9 @@ class SaleController extends Controller
         if ($request->filled('to')) {
             $query->whereDate('created_at', '<=', $request->to);
         }
-        if ($request->filled('branch_id')) {
+        if ($branchScope) {
+            $query->where('branch_id', $branchScope);
+        } elseif ($request->filled('branch_id')) {
             $query->where('branch_id', $request->branch_id);
         }
         if ($request->filled('status')) {
@@ -40,7 +44,7 @@ class SaleController extends Controller
 
         return Inertia::render('admin/sales/Index', [
             'sales' => $sales,
-            'branches' => Branch::active()->orderBy('name')->get(),
+            'branches' => Branch::active()->when($branchScope, fn($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
             'filters' => $request->only(['from', 'to', 'branch_id', 'status']),
             'summary' => [
                 'total' => (clone $query)->sum('total'),
@@ -51,12 +55,14 @@ class SaleController extends Controller
 
     public function create(Request $request): Response
     {
+        $branchScope = $request->user()->branchScope();
+
         return Inertia::render('admin/sales/Form', [
             'clients' => Client::orderBy('name')->limit(200)->get(),
-            'branches' => Branch::active()->orderBy('name')->get(),
+            'branches' => Branch::active()->when($branchScope, fn($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
             'services' => Service::with('category')->active()->get(),
             'products' => Product::with('category')->active()->get(),
-            'stylists' => Stylist::with('user')->active()->get(),
+            'stylists' => Stylist::with('user')->active()->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))->get(),
             'appointment' => $request->appointment_id
                 ? \App\Models\Appointment::with(['client', 'services.service', 'branch', 'stylist'])->find($request->appointment_id)
                 : null,
@@ -79,6 +85,10 @@ class SaleController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.stylist_id' => 'nullable|exists:stylists,id',
         ]);
+
+        if ($branchScope = $request->user()->branchScope()) {
+            abort_unless((int) $validated['branch_id'] === $branchScope, 403);
+        }
 
         $sale = Sale::create([
             'client_id' => $validated['client_id'] ?? null,
@@ -165,8 +175,10 @@ class SaleController extends Controller
         return redirect()->route('admin.sales.show', $sale)->with('success', 'Venta registrada.');
     }
 
-    public function show(Sale $sale): Response
+    public function show(Request $request, Sale $sale): Response
     {
+        $this->authorizeBranch($request, $sale);
+
         $sale->load(['client', 'branch', 'stylist.user', 'user', 'items.itemable', 'appointment']);
 
         return Inertia::render('admin/sales/Show', [
@@ -174,8 +186,10 @@ class SaleController extends Controller
         ]);
     }
 
-    public function ticket(Sale $sale): Response
+    public function ticket(Request $request, Sale $sale): Response
     {
+        $this->authorizeBranch($request, $sale);
+
         $sale->load(['client', 'branch', 'items.itemable']);
 
         return Inertia::render('admin/sales/Ticket', [
@@ -183,10 +197,17 @@ class SaleController extends Controller
         ]);
     }
 
-    public function destroy(Sale $sale): RedirectResponse
+    public function destroy(Request $request, Sale $sale): RedirectResponse
     {
+        $this->authorizeBranch($request, $sale);
         $sale->update(['status' => 'cancelled']);
         $sale->commissions()->update(['status' => 'cancelled']);
         return back()->with('success', 'Venta cancelada.');
+    }
+
+    private function authorizeBranch(Request $request, Sale $sale): void
+    {
+        $branchScope = $request->user()->branchScope();
+        abort_if($branchScope && $sale->branch_id !== $branchScope, 403);
     }
 }

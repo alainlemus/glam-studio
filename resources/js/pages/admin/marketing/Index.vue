@@ -11,6 +11,7 @@ import {
     Sparkles,
 } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { confirmDialog } from '@/composables/useConfirm';
 
 defineOptions({ layout: AppLayout });
 
@@ -43,11 +44,19 @@ const typeIcons: Record<string, string> = {
 };
 
 const activate = (id: number) => router.post(`/admin/marketing/${id}/activate`);
-const send = (id: number) => {
-    if (confirm('¿Enviar campaña a todos los clientes?')) router.post(`/admin/marketing/${id}/send`);
+const send = async (id: number) => {
+    if (await confirmDialog({
+        title: '¿Enviar campaña a todos los clientes?',
+        description: 'El mensaje se enviará de inmediato a todos los clientes activos.',
+        confirmText: 'Enviar',
+    })) router.post(`/admin/marketing/${id}/send`);
 };
-const destroy = (id: number) => {
-    if (confirm('¿Eliminar campaña?')) router.delete(`/admin/marketing/${id}`);
+const destroy = async (id: number) => {
+    if (await confirmDialog({
+        title: '¿Eliminar campaña?',
+        variant: 'destructive',
+        confirmText: 'Eliminar',
+    })) router.delete(`/admin/marketing/${id}`);
 };
 </script>
 

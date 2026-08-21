@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import {
     LayoutGrid,
     Building2,
@@ -21,6 +22,10 @@ import {
     Receipt,
     FolderOpen,
     Layers,
+    MessageSquareQuote,
+    Settings,
+    UserCog,
+    ShieldCheck,
 } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -136,7 +141,48 @@ const clientesNavItems: NavItem[] = [
         href: '/admin/loyalty',
         icon: Award,
     },
+    {
+        title: 'Testimonios',
+        href: '/admin/testimonials',
+        icon: MessageSquareQuote,
+    },
 ];
+
+const page = usePage();
+const role = computed(() => (page.props.auth as any)?.user?.role);
+const isAdmin = computed(() => role.value === 'admin');
+const isReceptionist = computed(() => role.value === 'receptionist');
+
+const sistemaNavItems = computed<NavItem[]>(() => isAdmin.value ? [
+    {
+        title: 'Usuarios',
+        href: '/admin/users',
+        icon: UserCog,
+    },
+    {
+        title: 'Configuración del sitio',
+        href: '/admin/settings',
+        icon: Settings,
+    },
+    {
+        title: 'Aviso de privacidad',
+        href: '/admin/privacy-policy',
+        icon: ShieldCheck,
+    },
+] : []);
+
+// La recepcionista solo gestiona citas, agenda, marketing y clientes (de su sucursal).
+const visibleOperacionNavItems = computed<NavItem[]>(() =>
+    isReceptionist.value
+        ? operacionNavItems.filter((item) => ['Agenda', 'Citas', 'Clientes'].includes(item.title))
+        : operacionNavItems
+);
+
+const visibleClientesNavItems = computed<NavItem[]>(() =>
+    isReceptionist.value
+        ? clientesNavItems.filter((item) => item.title === 'Marketing')
+        : clientesNavItems
+);
 </script>
 
 <template>
@@ -160,15 +206,18 @@ const clientesNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent class="relative px-3 py-4">
-            <NavMain :items="operacionNavItems" label="Operación" />
-            <NavMain :items="finanzasNavItems" label="Finanzas" />
-            <NavMain :items="catalogoNavItems" label="Catálogo" />
-            <NavMain :items="clientesNavItems" label="Crecimiento" />
+            <NavMain :items="visibleOperacionNavItems" label="Operación" />
+            <template v-if="!isReceptionist">
+                <NavMain :items="finanzasNavItems" label="Finanzas" />
+                <NavMain :items="catalogoNavItems" label="Catálogo" />
+            </template>
+            <NavMain :items="visibleClientesNavItems" label="Crecimiento" />
+            <NavMain v-if="sistemaNavItems.length" :items="sistemaNavItems" label="Sistema" />
         </SidebarContent>
 
         <SidebarFooter class="relative border-t border-sidebar-border/30 p-3 backdrop-blur-sm">
             <div class="mb-2 overflow-hidden rounded-xl border border-sidebar-border/50 bg-gradient-to-br from-sidebar-accent/80 to-sidebar-accent/40 p-3 backdrop-blur-sm transition-all duration-300 hover:border-silver/30 hover:shadow-lg hover:shadow-silver/5">
-                <Link href="/" class="flex items-center gap-2 text-xs text-sidebar-foreground/70 transition-colors hover:text-silver-bright">
+                <Link href="/" target="_blank" rel="noopener" class="flex items-center gap-2 text-xs text-sidebar-foreground/70 transition-colors hover:text-silver-bright">
                     <Globe class="size-3.5" />
                     Ver sitio público
                 </Link>

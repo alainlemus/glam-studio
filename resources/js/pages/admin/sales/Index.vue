@@ -84,6 +84,7 @@ const statusDots: Record<string, string> = {
         </div>
 
         <div class="overflow-hidden rounded-xl border border-smoke bg-card">
+            <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="border-b border-smoke bg-graphite">
                     <tr>
@@ -119,6 +120,7 @@ const statusDots: Record<string, string> = {
                     </tr>
                 </tbody>
             </table>
+            </div>
             <div v-if="sales.data.length === 0" class="px-6 py-16 text-center">
                 <ShoppingCart class="mx-auto h-12 w-12 text-mercury/30" />
                 <p class="mt-3 text-sm text-mercury">No hay ventas registradas</p>

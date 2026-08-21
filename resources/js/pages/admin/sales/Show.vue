@@ -94,6 +94,7 @@ const statusConfig: Record<string, { label: string; class: string; icon: any }> 
                         <h2 class="font-serif text-xl font-medium text-cream">Items de la venta</h2>
                     </div>
                     <div class="overflow-hidden rounded-lg border border-smoke">
+                        <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead>
                                 <tr class="border-b border-smoke bg-graphite">
@@ -141,6 +142,7 @@ const statusConfig: Record<string, { label: string; class: string; icon: any }> 
                                 </tr>
                             </tfoot>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>

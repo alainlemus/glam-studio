@@ -16,8 +16,13 @@ class CommissionController extends Controller
 {
     public function index(Request $request): Response
     {
+        $branchScope = $request->user()->branchScope();
+
         $query = Commission::with(['stylist.user', 'stylist.branch', 'sale', 'appointment']);
 
+        if ($branchScope) {
+            $query->whereHas('stylist', fn($q) => $q->where('branch_id', $branchScope));
+        }
         if ($request->filled('stylist_id')) {
             $query->where('stylist_id', $request->stylist_id);
         }
@@ -41,6 +46,7 @@ class CommissionController extends Controller
 
         $byStylist = Commission::selectRaw('stylist_id, sum(amount) as total, count(*) as count')
             ->with('stylist.user')
+            ->when($branchScope, fn($q) => $q->whereHas('stylist', fn($q2) => $q2->where('branch_id', $branchScope)))
             ->when($request->filled('from'), fn($q) => $q->whereDate('created_at', '>=', $request->from))
             ->when($request->filled('to'), fn($q) => $q->whereDate('created_at', '<=', $request->to))
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
@@ -50,15 +56,18 @@ class CommissionController extends Controller
 
         return Inertia::render('admin/commissions/Index', [
             'commissions' => $commissions,
-            'stylists' => Stylist::with('user')->active()->get(),
+            'stylists' => Stylist::with('user')->active()->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))->get(),
             'summary' => $summary,
             'byStylist' => $byStylist,
             'filters' => $request->only(['stylist_id', 'status', 'from', 'to']),
         ]);
     }
 
-    public function pay(Commission $commission): RedirectResponse
+    public function pay(Request $request, Commission $commission): RedirectResponse
     {
+        $branchScope = $request->user()->branchScope();
+        abort_if($branchScope && $commission->stylist->branch_id !== $branchScope, 403);
+
         $commission->markAsPaid();
         return back()->with('success', 'Comisión pagada.');
     }
@@ -73,6 +82,10 @@ class CommissionController extends Controller
         ]);
 
         $stylist = Stylist::findOrFail($validated['stylist_id']);
+
+        if ($branchScope = $request->user()->branchScope()) {
+            abort_unless($stylist->branch_id === $branchScope, 403);
+        }
 
         $commissions = Commission::where('stylist_id', $stylist->id)
             ->where('status', 'pending')

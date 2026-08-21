@@ -14,11 +14,15 @@ use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\LoyaltyController;
 use App\Http\Controllers\Admin\MarketingController;
 use App\Http\Controllers\Admin\ProductCategoryController;
+use App\Http\Controllers\Admin\PrivacyPolicyController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
 use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\StylistController;
+use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PublicAppointmentController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +36,7 @@ Route::get('/productos', [SiteController::class, 'products'])->name('site.produc
 Route::get('/nosotros', [SiteController::class, 'about'])->name('site.about');
 Route::get('/promociones', [SiteController::class, 'promotions'])->name('site.promotions');
 Route::get('/contacto', [SiteController::class, 'contact'])->name('site.contact');
+Route::get('/aviso-de-privacidad', [SiteController::class, 'privacyPolicy'])->name('site.privacy');
 
 // Booking
 Route::get('/agendar', [PublicAppointmentController::class, 'create'])->name('site.book');
@@ -40,8 +45,11 @@ Route::post('/api/slots', [PublicAppointmentController::class, 'availableSlots']
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        if (auth()->user()->isAdmin() || auth()->user()->isManager() || auth()->user()->isReceptionist()) {
+        if (auth()->user()->isAdmin() || auth()->user()->isManager()) {
             return redirect()->route('admin.dashboard');
+        }
+        if (auth()->user()->isReceptionist()) {
+            return redirect()->route('admin.appointments.calendar');
         }
         return redirect()->route('admin.stylist.dashboard');
     })->name('dashboard');
@@ -56,59 +64,80 @@ Route::middleware(['auth', 'verified', 'role:admin,manager,receptionist,stylist'
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-        // Sucursales y Ciudades
-        Route::resource('branches', BranchController::class);
-        Route::resource('cities', CityController::class);
-        Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show']);
+        // Citas, agenda, marketing y clientes: admin, gerente y recepcionista
+        // (todo se filtra por sucursal para gerente/recepcionista, ver branchScope()).
+        Route::middleware('role:admin,manager,receptionist')->group(function () {
+            Route::get('appointments/calendar', [AppointmentController::class, 'calendar'])->name('appointments.calendar');
+            Route::resource('appointments', AppointmentController::class);
+            Route::post('appointments/{appointment}/confirm', [AppointmentController::class, 'confirm'])->name('appointments.confirm');
+            Route::post('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
+            Route::post('appointments/{appointment}/complete', [AppointmentController::class, 'complete'])->name('appointments.complete');
+            Route::post('appointments/{appointment}/no-show', [AppointmentController::class, 'noShow'])->name('appointments.no_show');
 
-        // Servicios
-        Route::resource('services', ServiceController::class);
-        Route::resource('service-categories', ServiceCategoryController::class);
+            Route::resource('clients', ClientController::class);
 
-        // Productos e Inventario
-        Route::resource('products', ProductController::class);
-        Route::resource('product-categories', ProductCategoryController::class);
-        Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
-        Route::post('inventory/{product}/{branch}/adjust', [InventoryController::class, 'adjust'])->name('inventory.adjust');
-        Route::post('inventory/transfer', [InventoryController::class, 'transfer'])->name('inventory.transfer');
+            Route::resource('marketing', MarketingController::class);
+            Route::post('marketing/{campaign}/activate', [MarketingController::class, 'activate'])->name('marketing.activate');
+            Route::post('marketing/{campaign}/send', [MarketingController::class, 'send'])->name('marketing.send');
+        });
 
-        // Estilistas y Clientes
-        Route::resource('stylists', StylistController::class);
-        Route::resource('clients', ClientController::class);
+        // Resto de la operación: solo admin y gerente (gerente restringido a su sucursal)
+        Route::middleware('role:admin,manager')->group(function () {
+            Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-        // Citas
-        Route::get('appointments/calendar', [AppointmentController::class, 'calendar'])->name('appointments.calendar');
-        Route::resource('appointments', AppointmentController::class);
-        Route::post('appointments/{appointment}/confirm', [AppointmentController::class, 'confirm'])->name('appointments.confirm');
-        Route::post('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
-        Route::post('appointments/{appointment}/complete', [AppointmentController::class, 'complete'])->name('appointments.complete');
-        Route::post('appointments/{appointment}/no-show', [AppointmentController::class, 'noShow'])->name('appointments.no_show');
+            // Sucursales y Ciudades
+            Route::resource('branches', BranchController::class);
+            Route::resource('cities', CityController::class);
+            Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show']);
 
-        // Ventas
-        Route::resource('sales', SaleController::class);
-        Route::get('sales/{sale}/ticket', [SaleController::class, 'ticket'])->name('sales.ticket');
+            // Servicios
+            Route::resource('services', ServiceController::class);
+            Route::resource('service-categories', ServiceCategoryController::class);
 
-        // Comisiones
-        Route::get('commissions', [CommissionController::class, 'index'])->name('commissions.index');
-        Route::post('commissions/{commission}/pay', [CommissionController::class, 'pay'])->name('commissions.pay');
-        Route::post('commissions/pay-batch', [CommissionController::class, 'payBatch'])->name('commissions.pay_batch');
+            // Productos e Inventario
+            Route::resource('products', ProductController::class);
+            Route::resource('product-categories', ProductCategoryController::class);
+            Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
+            Route::post('inventory/{product}/{branch}/adjust', [InventoryController::class, 'adjust'])->name('inventory.adjust');
+            Route::post('inventory/transfer', [InventoryController::class, 'transfer'])->name('inventory.transfer');
 
-        // Finanzas
-        Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
-        Route::resource('expenses', ExpenseController::class);
-        Route::resource('incomes', IncomeController::class);
+            // Estilistas
+            Route::resource('stylists', StylistController::class);
 
-        // Marketing
-        Route::resource('marketing', MarketingController::class);
-        Route::post('marketing/{campaign}/activate', [MarketingController::class, 'activate'])->name('marketing.activate');
-        Route::post('marketing/{campaign}/send', [MarketingController::class, 'send'])->name('marketing.send');
+            // Ventas
+            Route::resource('sales', SaleController::class);
+            Route::get('sales/{sale}/ticket', [SaleController::class, 'ticket'])->name('sales.ticket');
 
-        // Lealtad
-        Route::get('loyalty', [LoyaltyController::class, 'index'])->name('loyalty.index');
-        Route::post('loyalty/{card}/add-stamp', [LoyaltyController::class, 'addStamp'])->name('loyalty.add_stamp');
-        Route::post('loyalty/{card}/redeem', [LoyaltyController::class, 'redeem'])->name('loyalty.redeem');
+            // Comisiones
+            Route::get('commissions', [CommissionController::class, 'index'])->name('commissions.index');
+            Route::post('commissions/{commission}/pay', [CommissionController::class, 'pay'])->name('commissions.pay');
+            Route::post('commissions/pay-batch', [CommissionController::class, 'payBatch'])->name('commissions.pay_batch');
+
+            // Finanzas
+            Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
+            Route::resource('expenses', ExpenseController::class);
+            Route::resource('incomes', IncomeController::class);
+
+            // Lealtad
+            Route::get('loyalty', [LoyaltyController::class, 'index'])->name('loyalty.index');
+            Route::post('loyalty/{card}/add-stamp', [LoyaltyController::class, 'addStamp'])->name('loyalty.add_stamp');
+            Route::post('loyalty/{card}/redeem', [LoyaltyController::class, 'redeem'])->name('loyalty.redeem');
+
+            // Testimonios
+            Route::resource('testimonials', TestimonialController::class)->except(['show']);
+        });
+
+        // Usuarios, configuración del sitio y aviso de privacidad: solo administradores
+        Route::middleware('role:admin')->group(function () {
+            Route::resource('users', UserController::class)->except(['show']);
+
+            Route::get('settings', [SiteSettingController::class, 'edit'])->name('settings.edit');
+            Route::put('settings', [SiteSettingController::class, 'update'])->name('settings.update');
+
+            Route::get('privacy-policy', [PrivacyPolicyController::class, 'edit'])->name('privacy-policy.edit');
+            Route::put('privacy-policy', [PrivacyPolicyController::class, 'update'])->name('privacy-policy.update');
+        });
     });
 
 require __DIR__.'/settings.php';

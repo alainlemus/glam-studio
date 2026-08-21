@@ -11,6 +11,7 @@ import {
     ChevronDown,
 } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { confirmDialog } from '@/composables/useConfirm';
 
 defineOptions({ layout: AppLayout });
 
@@ -29,8 +30,13 @@ const filter = () => {
     }, { preserveState: true });
 };
 
-const destroy = (id: number) => {
-    if (confirm('¿Eliminar este cliente?')) router.delete(`/admin/clients/${id}`);
+const destroy = async (id: number) => {
+    if (await confirmDialog({
+        title: '¿Eliminar este cliente?',
+        description: 'Esta acción no se puede deshacer.',
+        variant: 'destructive',
+        confirmText: 'Eliminar',
+    })) router.delete(`/admin/clients/${id}`);
 };
 </script>
 

@@ -2,16 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AppointmentBooked;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
 use App\Models\Branch;
 use App\Models\Client;
 use App\Models\Service;
+use App\Models\SiteSetting;
 use App\Models\Stylist;
 use App\Models\StylistSchedule;
+use App\Models\Testimonial;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -26,10 +32,23 @@ class PublicAppointmentController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        $testimonial = Testimonial::active()->inRandomOrder()->first();
+        $reviewStats = [
+            'count' => Testimonial::active()->count(),
+            'average' => round((float) Testimonial::active()->avg('rating'), 1),
+        ];
+        $appointmentsThisMonth = Appointment::whereMonth('date', now()->month)
+            ->whereYear('date', now()->year)
+            ->whereNotIn('status', ['cancelled'])
+            ->count();
+
         return Inertia::render('site/Book', [
             'branches' => $branches,
             'services' => $services,
             'categories' => $categories,
+            'testimonial' => $testimonial,
+            'reviewStats' => $reviewStats,
+            'appointmentsThisMonth' => $appointmentsThisMonth,
             'preselected' => [
                 'branch_id' => $request->query('branch'),
                 'service_id' => $request->query('service'),
@@ -146,7 +165,7 @@ class PublicAppointmentController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
+            'email' => 'required|email|max:255',
             'branch_id' => 'required|exists:branches,id',
             'service_id' => 'required|exists:services,id',
             'stylist_id' => 'nullable|exists:stylists,id',
@@ -159,10 +178,14 @@ class PublicAppointmentController extends Controller
             ['phone' => $validated['phone']],
             [
                 'name' => $validated['name'],
-                'email' => $validated['email'] ?? null,
+                'email' => $validated['email'],
                 'is_active' => true,
             ]
         );
+
+        if ($client->email !== $validated['email']) {
+            $client->update(['email' => $validated['email']]);
+        }
 
         if (!$client->canBook()) {
             return back()->withErrors(['phone' => 'Lo sentimos, no puedes agendar citas. Contacta a la sucursal.']);
@@ -230,8 +253,12 @@ class PublicAppointmentController extends Controller
         $whatsappMessage = "¡Hola! Soy {$client->name}, acabo de agendar una cita ({$appointment->code}) para {$service->name} el {$appointment->date->format('d/m/Y')} a las {$appointment->start_time}.";
         $branch = Branch::findOrFail($validated['branch_id']);
 
+        $appointment->load(['client', 'services.service', 'branch', 'stylist.user']);
+
+        $this->sendConfirmationEmails($appointment);
+
         return Inertia::render('site/BookSuccess', [
-            'appointment' => $appointment->load(['client', 'services.service', 'branch', 'stylist.user']),
+            'appointment' => $appointment,
             'whatsappUrl' => \App\Services\WhatsAppService::linkForPhone($branch->whatsapp, $whatsappMessage),
         ]);
     }
@@ -254,5 +281,30 @@ class PublicAppointmentController extends Controller
         }
 
         return $query->exists();
+    }
+
+    private function sendConfirmationEmails(Appointment $appointment): void
+    {
+        try {
+            if ($appointment->client?->email) {
+                Mail::to($appointment->client->email)
+                    ->send(new AppointmentBooked($appointment, forStaff: false));
+            }
+
+            $notificationEmail = SiteSetting::current()->notification_email;
+            $staffRecipients = $notificationEmail
+                ? [$notificationEmail]
+                : User::where('role', User::ROLE_ADMIN)->pluck('email')->all();
+
+            if (!empty($staffRecipients)) {
+                Mail::to($staffRecipients)
+                    ->send(new AppointmentBooked($appointment, forStaff: true));
+            }
+        } catch (\Throwable $e) {
+            Log::error('No se pudo enviar el correo de confirmación de cita.', [
+                'appointment_id' => $appointment->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

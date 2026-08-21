@@ -89,6 +89,15 @@ class User extends Authenticatable implements PasskeyUser
         return $this->role === $roles;
     }
 
+    /**
+     * Sucursal a la que debe restringirse este usuario, o null si puede
+     * ver todas las sucursales (solo administradores).
+     */
+    public function branchScope(): ?int
+    {
+        return $this->isAdmin() ? null : $this->branch_id;
+    }
+
     public function initials(): string
     {
         $words = explode(' ', $this->name);

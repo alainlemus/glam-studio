@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import { Calendar, User, Phone, MapPin, Scissors, Clock, CheckCircle2, XCircle, AlertTriangle, ChevronLeft, DollarSign, Sparkles } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { confirmDialog } from '@/composables/useConfirm';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 defineOptions({ layout: AppLayout });
 
@@ -22,14 +31,24 @@ const formatPrice = (p: any) => new Intl.NumberFormat('es-MX', { style: 'currenc
 
 const confirm = () => router.post(`/admin/appointments/${props.appointment.id}/confirm`);
 const complete = () => router.post(`/admin/appointments/${props.appointment.id}/complete`);
-const noShow = () => {
-    if (window.confirm('¿Marcar como no-show?')) router.post(`/admin/appointments/${props.appointment.id}/no-show`);
+const noShow = async () => {
+    if (await confirmDialog({
+        title: '¿Marcar como no-show?',
+        description: 'Se registrará que la clienta no se presentó a su cita.',
+        confirmText: 'Marcar no-show',
+    })) router.post(`/admin/appointments/${props.appointment.id}/no-show`);
 };
+
+const showCancelModal = ref(false);
+const cancelReason = ref('');
 const cancel = () => {
-    const reason = prompt('Motivo de cancelación:');
-    if (reason !== null) {
-        router.post(`/admin/appointments/${props.appointment.id}/cancel`, { reason });
-    }
+    cancelReason.value = '';
+    showCancelModal.value = true;
+};
+const confirmCancel = () => {
+    router.post(`/admin/appointments/${props.appointment.id}/cancel`, { reason: cancelReason.value }, {
+        onSuccess: () => (showCancelModal.value = false),
+    });
 };
 </script>
 
@@ -212,5 +231,30 @@ const cancel = () => {
                 </div>
             </div>
         </div>
+
+        <Dialog v-model:open="showCancelModal">
+            <DialogContent class="border-smoke bg-card sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle class="font-serif text-xl font-medium text-cream">¿Cancelar esta cita?</DialogTitle>
+                    <DialogDescription class="pt-1 text-sm text-mercury">
+                        Indica el motivo de la cancelación (opcional).
+                    </DialogDescription>
+                </DialogHeader>
+                <textarea
+                    v-model="cancelReason"
+                    rows="3"
+                    placeholder="Motivo de cancelación..."
+                    class="input-elegant"
+                ></textarea>
+                <div class="mt-2 flex justify-end gap-3">
+                    <button type="button" class="btn-ghost-elegant h-11 px-6" @click="showCancelModal = false">
+                        Volver
+                    </button>
+                    <button type="button" class="h-11 rounded-full bg-red-500 px-6 text-sm font-semibold text-white transition-all hover:bg-red-400 active:scale-[0.98]" @click="confirmCancel">
+                        Cancelar cita
+                    </button>
+                </div>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>

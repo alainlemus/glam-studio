@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import { MapPin, Plus } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { confirmDialog } from '@/composables/useConfirm';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 defineOptions({ layout: AppLayout });
 
@@ -17,17 +25,30 @@ const submit = () => {
     });
 };
 
-const destroy = (id: number) => {
-    if (confirm('¿Eliminar esta ciudad?')) router.delete(`/admin/cities/${id}`);
+const destroy = async (id: number) => {
+    if (await confirmDialog({
+        title: '¿Eliminar esta ciudad?',
+        variant: 'destructive',
+        confirmText: 'Eliminar',
+    })) router.delete(`/admin/cities/${id}`);
 };
 
+const showEditModal = ref(false);
+const editForm = useForm({ id: 0, name: '', state: '', country: '', is_active: true });
+
 const edit = (city: any) => {
-    const name = prompt('Nombre:', city.name);
-    if (name === null) return;
-    const state = prompt('Estado:', city.state || '');
-    if (state === null) return;
-    const isActive = confirm('¿Activa?');
-    router.put(`/admin/cities/${city.id}`, { name, state, country: city.country, is_active: isActive });
+    editForm.id = city.id;
+    editForm.name = city.name;
+    editForm.state = city.state || '';
+    editForm.country = city.country;
+    editForm.is_active = city.is_active;
+    showEditModal.value = true;
+};
+
+const submitEdit = () => {
+    editForm.put(`/admin/cities/${editForm.id}`, {
+        onSuccess: () => (showEditModal.value = false),
+    });
 };
 </script>
 
@@ -76,5 +97,33 @@ const edit = (city: any) => {
                 </div>
             </div>
         </div>
+
+        <Dialog v-model:open="showEditModal">
+            <DialogContent class="border-smoke bg-card sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle class="font-serif text-xl font-medium text-cream">Editar ciudad</DialogTitle>
+                </DialogHeader>
+                <div class="space-y-3">
+                    <div>
+                        <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">Nombre</label>
+                        <input v-model="editForm.name" class="input-elegant" />
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-mercury">Estado</label>
+                        <input v-model="editForm.state" class="input-elegant" />
+                    </div>
+                    <label class="inline-flex items-center gap-3">
+                        <input v-model="editForm.is_active" type="checkbox" class="h-5 w-5 rounded border-smoke bg-graphite text-silver focus:ring-silver" />
+                        <span class="text-sm font-medium text-cream">Ciudad activa</span>
+                    </label>
+                </div>
+                <div class="mt-2 flex justify-end gap-3">
+                    <button type="button" class="btn-ghost-elegant h-11 px-6" @click="showEditModal = false">Cancelar</button>
+                    <button type="button" :disabled="editForm.processing" class="btn-primary-elegant h-11 px-6 disabled:opacity-50" @click="submitEdit">
+                        Guardar
+                    </button>
+                </div>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>
