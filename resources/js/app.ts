@@ -5,6 +5,7 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import SiteLayout from '@/layouts/site/SiteLayout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
+import { vReveal } from '@/directives/reveal';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Salones Belleza';
 
@@ -30,6 +31,9 @@ createInertiaApp({
         }
 
         return page;
+    },
+    withApp(app) {
+        app.directive('reveal', vReveal);
     },
 });
 

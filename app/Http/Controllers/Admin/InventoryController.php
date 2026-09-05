@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\Product;
 use App\Models\ProductStock;
+use App\Notifications\LowStockNotification;
+use App\Support\NotificationRecipients;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,19 +21,18 @@ class InventoryController extends Controller
         $branchScope = $request->user()->branchScope();
 
         $stocks = ProductStock::with(['product.category', 'branch'])
-            ->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))
-            ->when(!$branchScope && $request->branch_id, fn($q) => $q->where('branch_id', $request->branch_id))
-            ->when($request->low_stock, fn($q) => $q->whereColumn('stock', '<=', 'min_stock'))
-            ->when($request->search, fn($q) => $q->whereHas('product', fn($q2) =>
-                $q2->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('sku', 'like', "%{$request->search}%")))
+            ->when($branchScope, fn ($q) => $q->where('branch_id', $branchScope))
+            ->when(! $branchScope && $request->branch_id, fn ($q) => $q->where('branch_id', $request->branch_id))
+            ->when($request->low_stock, fn ($q) => $q->whereColumn('stock', '<=', 'min_stock'))
+            ->when($request->search, fn ($q) => $q->whereHas('product', fn ($q2) => $q2->where('name', 'like', "%{$request->search}%")
+                ->orWhere('sku', 'like', "%{$request->search}%")))
             ->orderBy('stock')
             ->paginate(20)
             ->withQueryString();
 
         return Inertia::render('admin/inventory/Index', [
             'stocks' => $stocks,
-            'branches' => Branch::active()->when($branchScope, fn($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
+            'branches' => Branch::active()->when($branchScope, fn ($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
             'filters' => $request->only(['search', 'branch_id', 'low_stock']),
         ]);
     }
@@ -50,9 +52,18 @@ class InventoryController extends Controller
             ['stock' => 0, 'min_stock' => $product->min_stock]
         );
 
+        $wasLow = $stock->stock <= $stock->min_stock;
+
         $stock->stock += $validated['adjustment'];
-        if ($stock->stock < 0) $stock->stock = 0;
+        if ($stock->stock < 0) {
+            $stock->stock = 0;
+        }
         $stock->save();
+
+        if (! $wasLow && $stock->stock <= $stock->min_stock) {
+            $stock->load(['product', 'branch']);
+            Notification::send(NotificationRecipients::forBranch($branch->id), new LowStockNotification($stock));
+        }
 
         return back()->with('success', "Stock ajustado: {$validated['adjustment']} unidades ({$validated['reason']}).");
     }
@@ -72,11 +83,17 @@ class InventoryController extends Controller
             ->where('branch_id', $validated['from_branch_id'])
             ->first();
 
-        if (!$from || $from->stock < $validated['quantity']) {
+        if (! $from || $from->stock < $validated['quantity']) {
             return back()->withErrors(['quantity' => 'Stock insuficiente en la sucursal de origen.']);
         }
 
+        $fromWasLow = $from->stock <= $from->min_stock;
         $from->decrement('stock', $validated['quantity']);
+
+        if (! $fromWasLow && $from->stock <= $from->min_stock) {
+            $from->load(['product', 'branch']);
+            Notification::send(NotificationRecipients::forBranch($from->branch_id), new LowStockNotification($from));
+        }
 
         $to = ProductStock::firstOrCreate(
             ['product_id' => $validated['product_id'], 'branch_id' => $validated['to_branch_id']],

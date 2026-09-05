@@ -9,9 +9,13 @@ use App\Models\Branch;
 use App\Models\Client;
 use App\Models\Service;
 use App\Models\Stylist;
+use App\Notifications\AppointmentCancelledNotification;
+use App\Notifications\NoShowNotification;
+use App\Support\NotificationRecipients;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -50,8 +54,8 @@ class AppointmentController extends Controller
 
         return Inertia::render('admin/appointments/Index', [
             'appointments' => $appointments,
-            'branches' => Branch::active()->when($branchScope, fn($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
-            'stylists' => Stylist::with('user')->active()->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))->get(),
+            'branches' => Branch::active()->when($branchScope, fn ($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
+            'stylists' => Stylist::with('user')->active()->when($branchScope, fn ($q) => $q->where('branch_id', $branchScope))->get(),
             'filters' => $request->only(['date', 'from', 'to', 'status', 'branch_id', 'stylist_id']),
         ]);
     }
@@ -78,8 +82,8 @@ class AppointmentController extends Controller
 
         return Inertia::render('admin/appointments/Calendar', [
             'appointments' => $appointments,
-            'branches' => Branch::active()->when($branchScope, fn($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
-            'stylists' => Stylist::with('user')->active()->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))->get(),
+            'branches' => Branch::active()->when($branchScope, fn ($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
+            'stylists' => Stylist::with('user')->active()->when($branchScope, fn ($q) => $q->where('branch_id', $branchScope))->get(),
             'range' => [
                 'from' => $from->format('Y-m-d'),
                 'to' => $to->format('Y-m-d'),
@@ -94,9 +98,9 @@ class AppointmentController extends Controller
 
         return Inertia::render('admin/appointments/Form', [
             'clients' => Client::orderBy('name')->limit(200)->get(),
-            'branches' => Branch::active()->when($branchScope, fn($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
+            'branches' => Branch::active()->when($branchScope, fn ($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
             'services' => Service::with('category')->active()->get(),
-            'stylists' => Stylist::with('user')->active()->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))->get(),
+            'stylists' => Stylist::with('user')->active()->when($branchScope, fn ($q) => $q->where('branch_id', $branchScope))->get(),
         ]);
     }
 
@@ -182,9 +186,9 @@ class AppointmentController extends Controller
         return Inertia::render('admin/appointments/Form', [
             'appointment' => $appointment,
             'clients' => Client::orderBy('name')->limit(200)->get(),
-            'branches' => Branch::active()->when($branchScope, fn($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
+            'branches' => Branch::active()->when($branchScope, fn ($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
             'services' => Service::with('category')->active()->get(),
-            'stylists' => Stylist::with('user')->active()->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))->get(),
+            'stylists' => Stylist::with('user')->active()->when($branchScope, fn ($q) => $q->where('branch_id', $branchScope))->get(),
         ]);
     }
 
@@ -223,6 +227,7 @@ class AppointmentController extends Controller
     {
         $this->authorizeBranch($request, $appointment);
         $appointment->update(['status' => 'confirmed']);
+
         return back()->with('success', 'Cita confirmada.');
     }
 
@@ -239,6 +244,12 @@ class AppointmentController extends Controller
             'cancellation_reason' => $validated['reason'] ?? null,
         ]);
 
+        $appointment->load(['client', 'branch']);
+        Notification::send(
+            NotificationRecipients::forBranch($appointment->branch_id),
+            new AppointmentCancelledNotification($appointment),
+        );
+
         return back()->with('success', 'Cita cancelada.');
     }
 
@@ -246,6 +257,7 @@ class AppointmentController extends Controller
     {
         $this->authorizeBranch($request, $appointment);
         $appointment->update(['status' => 'completed']);
+
         return back()->with('success', 'Cita marcada como completada.');
     }
 
@@ -255,6 +267,12 @@ class AppointmentController extends Controller
         $appointment->update(['status' => 'no_show']);
         $appointment->client?->registerNoShow();
 
+        $appointment->load(['client', 'branch']);
+        Notification::send(
+            NotificationRecipients::forBranch($appointment->branch_id),
+            new NoShowNotification($appointment),
+        );
+
         return back()->with('success', 'Cita marcada como no-show.');
     }
 
@@ -262,6 +280,7 @@ class AppointmentController extends Controller
     {
         $this->authorizeBranch($request, $appointment);
         $appointment->delete();
+
         return redirect()->route('admin.appointments.index')->with('success', 'Cita eliminada.');
     }
 

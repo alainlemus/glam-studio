@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import SiteLayout from '@/layouts/site/SiteLayout.vue';
 import { ChevronRight, Clock, Sparkles } from '@lucide/vue';
 
@@ -7,7 +8,10 @@ defineOptions({ layout: SiteLayout });
 
 defineProps<{
     categories: any[];
+    seo?: { title: string; description: string };
 }>();
+
+const activeCategory = ref<number | null>(null);
 
 const formatPrice = (price: string | number) => {
     return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(Number(price));
@@ -34,7 +38,7 @@ const serviceImages: Record<number, string> = {
 </script>
 
 <template>
-    <Head title="Servicios" />
+    <Head :title="seo?.title ?? 'Servicios'" />
 
     <!-- HERO CON IMAGEN DE FONDO -->
     <section class="relative overflow-hidden border-b border-smoke bg-ink py-24 lg:py-32">
@@ -68,10 +72,36 @@ const serviceImages: Record<number, string> = {
         </div>
     </section>
 
+    <!-- FILTRO POR CATEGORÍA -->
+    <div class="sticky top-20 z-30 border-b border-smoke bg-ink/90 backdrop-blur-xl">
+        <div class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+                <button
+                    type="button"
+                    @click="activeCategory = null"
+                    class="chip border transition"
+                    :class="activeCategory === null ? 'border-silver-bright bg-silver-bright text-ink' : 'border-smoke text-mercury hover:border-silver/40 hover:text-cream'"
+                >
+                    Todas
+                </button>
+                <button
+                    v-for="category in categories"
+                    :key="category.id"
+                    type="button"
+                    @click="activeCategory = category.id"
+                    class="chip border transition"
+                    :class="activeCategory === category.id ? 'border-silver-bright bg-silver-bright text-ink' : 'border-smoke text-mercury hover:border-silver/40 hover:text-cream'"
+                >
+                    {{ category.icon }} {{ category.name }}
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- SERVICIOS POR CATEGORÍA -->
     <section class="py-20 lg:py-28">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div v-for="(category, catIndex) in categories" :key="category.id" class="mb-24 last:mb-0">
+            <div v-for="(category, catIndex) in categories" v-show="activeCategory === null || activeCategory === category.id" :key="category.id" class="mb-24 last:mb-0">
                 <!-- Header de categoría con imagen -->
                 <div class="mb-12 overflow-hidden rounded-3xl">
                     <div class="relative h-64 lg:h-80">
@@ -100,8 +130,8 @@ const serviceImages: Record<number, string> = {
                     <div
                         v-for="(service, index) in category.services"
                         :key="service.id"
-                        class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:border-silver/30 animate-fade-in"
-                        :style="{ animationDelay: `${index * 50}ms` }"
+                        class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:border-silver/30"
+                        v-reveal="index * 50"
                     >
                         <!-- Imagen del servicio -->
                         <div class="relative h-48 overflow-hidden">

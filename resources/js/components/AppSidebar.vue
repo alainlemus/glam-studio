@@ -26,6 +26,7 @@ import {
     Settings,
     UserCog,
     ShieldCheck,
+    History,
 } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -168,6 +169,11 @@ const sistemaNavItems = computed<NavItem[]>(() => isAdmin.value ? [
         title: 'Aviso de privacidad',
         href: '/admin/privacy-policy',
         icon: ShieldCheck,
+    },
+    {
+        title: 'Auditoría',
+        href: '/admin/audit-log',
+        icon: History,
     },
 ] : []);
 

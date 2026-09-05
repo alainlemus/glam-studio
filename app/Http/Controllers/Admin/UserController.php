@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\User;
+use App\Support\Audit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -24,9 +25,9 @@ class UserController extends Controller
     {
         $users = User::with('branch')
             ->whereIn('role', self::MANAGEABLE_ROLES)
-            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%")
+            ->when($request->search, fn ($q) => $q->where('name', 'like', "%{$request->search}%")
                 ->orWhere('email', 'like', "%{$request->search}%"))
-            ->when($request->role, fn($q) => $q->where('role', $request->role))
+            ->when($request->role, fn ($q) => $q->where('role', $request->role))
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
@@ -81,7 +82,7 @@ class UserController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,'.$user->id,
             'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:8|confirmed',
             'role' => ['required', Rule::in(self::MANAGEABLE_ROLES)],
@@ -93,17 +94,29 @@ class UserController extends Controller
             return back()->withErrors(['role' => 'No puedes quitarte a ti mismo el rol de administrador.']);
         }
 
-        if ($request->user()->id === $user->id && !$request->boolean('is_active', true)) {
+        if ($request->user()->id === $user->id && ! $request->boolean('is_active', true)) {
             return back()->withErrors(['is_active' => 'No puedes desactivar tu propia cuenta.']);
         }
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);
         }
 
         $validated['is_active'] = $request->boolean('is_active', true);
+
+        if ($user->role !== $validated['role']) {
+            Audit::record('role_changed', $user, "Cambió el rol de {$user->name} de \"{$user->role}\" a \"{$validated['role']}\".", [
+                'role' => ['old' => $user->role, 'new' => $validated['role']],
+            ]);
+        }
+        if ($user->is_active !== $validated['is_active']) {
+            $action = $validated['is_active'] ? 'reactivó' : 'desactivó';
+            Audit::record('status_changed', $user, "Se {$action} la cuenta de {$user->name}.", [
+                'is_active' => ['old' => $user->is_active, 'new' => $validated['is_active']],
+            ]);
+        }
 
         $user->update($validated);
 
@@ -117,6 +130,8 @@ class UserController extends Controller
         if ($request->user()->id === $user->id) {
             return back()->withErrors(['error' => 'No puedes eliminar tu propia cuenta.']);
         }
+
+        Audit::record('deleted', $user, "Eliminó al usuario {$user->name} ({$user->email}), rol {$user->role}.");
 
         $user->delete();
 

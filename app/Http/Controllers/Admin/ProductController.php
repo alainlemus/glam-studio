@@ -7,8 +7,10 @@ use App\Models\Branch;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductStock;
+use App\Support\Audit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,9 +19,9 @@ class ProductController extends Controller
     public function index(Request $request): Response
     {
         $products = Product::with('category')
-            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%")
+            ->when($request->search, fn ($q) => $q->where('name', 'like', "%{$request->search}%")
                 ->orWhere('sku', 'like', "%{$request->search}%"))
-            ->when($request->category_id, fn($q) => $q->where('product_category_id', $request->category_id))
+            ->when($request->category_id, fn ($q) => $q->where('product_category_id', $request->category_id))
             ->withSum('stocks', 'stock')
             ->orderBy('name')
             ->paginate(15)
@@ -55,11 +57,11 @@ class ProductController extends Controller
             'initial_stock.*' => 'nullable|integer|min:0',
         ]);
 
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        $validated['slug'] = Str::slug($validated['name']);
         $validated['is_active'] = $request->boolean('is_active', true);
 
         if (empty($validated['sku'])) {
-            $validated['sku'] = 'SKU-' . strtoupper(\Illuminate\Support\Str::random(8));
+            $validated['sku'] = 'SKU-'.strtoupper(Str::random(8));
         }
 
         $product = Product::create($validated);
@@ -106,6 +108,13 @@ class ProductController extends Controller
         ]);
 
         $validated['is_active'] = $request->boolean('is_active', true);
+
+        if ((float) $product->price !== (float) $validated['price']) {
+            Audit::record('price_changed', $product, "Cambió el precio de \"{$product->name}\" de $".number_format($product->price, 2).' a $'.number_format($validated['price'], 2).'.', [
+                'price' => ['old' => (float) $product->price, 'new' => (float) $validated['price']],
+            ]);
+        }
+
         $product->update($validated);
 
         return redirect()->route('admin.products.index')->with('success', 'Producto actualizado.');
@@ -113,7 +122,9 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
+        Audit::record('deleted', $product, "Eliminó el producto \"{$product->name}\".");
         $product->delete();
+
         return redirect()->route('admin.products.index')->with('success', 'Producto eliminado.');
     }
 }

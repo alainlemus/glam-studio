@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import {
     Plus,
     Search,
@@ -8,6 +8,7 @@ import {
     ChevronDown,
     Calendar,
     Users,
+    Download,
 } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 
@@ -33,6 +34,15 @@ const filter = () => {
         branch_id: branchId.value || undefined,
     }, { preserveState: true });
 };
+
+const exportUrl = computed(() => {
+    const params = new URLSearchParams();
+    if (from.value) params.set('from', from.value);
+    if (to.value) params.set('to', to.value);
+    if (branchId.value) params.set('branch_id', branchId.value);
+    const qs = params.toString();
+    return `/admin/sales/export${qs ? `?${qs}` : ''}`;
+});
 
 const statusColors: Record<string, string> = {
     paid: 'bg-emerald-500/15 text-emerald-400',
@@ -61,10 +71,16 @@ const statusDots: Record<string, string> = {
                     {{ summary.count }} ventas · {{ formatPrice(summary.total) }}
                 </p>
             </div>
-            <Link href="/admin/sales/create" class="btn-primary-elegant h-12 px-5 text-sm">
-                <Plus class="h-4 w-4" />
-                Nueva venta
-            </Link>
+            <div class="flex gap-3">
+                <a :href="exportUrl" class="btn-ghost-elegant h-12 px-5 text-sm">
+                    <Download class="h-4 w-4" />
+                    Exportar CSV
+                </a>
+                <Link href="/admin/sales/create" class="btn-primary-elegant h-12 px-5 text-sm">
+                    <Plus class="h-4 w-4" />
+                    Nueva venta
+                </Link>
+            </div>
         </div>
 
         <div class="flex flex-wrap gap-3 rounded-xl border border-smoke bg-card p-4">

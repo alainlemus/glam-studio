@@ -7,11 +7,12 @@ defineOptions({ layout: SiteLayout });
 
 defineProps<{
     campaigns: any[];
+    seo?: { title: string; description: string };
 }>();
 </script>
 
 <template>
-    <Head title="Promociones" />
+    <Head :title="seo?.title ?? 'Promociones'" />
 
     <section class="relative overflow-hidden border-b border-smoke bg-gradient-dark py-16 lg:py-24">
         <div class="pointer-events-none absolute inset-0">
@@ -37,9 +38,10 @@ defineProps<{
 
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <div
-                    v-for="campaign in campaigns"
+                    v-for="(campaign, index) in campaigns"
                     :key="campaign.id"
                     class="card-glow relative overflow-hidden p-8"
+                    v-reveal="index * 100"
                 >
                     <div class="absolute -right-12 -top-12 h-32 w-32 rounded-full bg-silver/10 blur-2xl"></div>
 

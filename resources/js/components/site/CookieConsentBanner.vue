@@ -39,9 +39,9 @@ const accept = () => {
             role="dialog"
             aria-live="polite"
             aria-label="Aviso de cookies y privacidad"
-            class="fixed inset-x-0 bottom-0 z-[60] px-4 pb-4 sm:px-6 sm:pb-6"
+            class="pointer-events-none fixed inset-x-0 bottom-0 z-[60] px-4 pb-4 sm:px-6 sm:pb-6"
         >
-            <div class="glass-card mx-auto flex max-w-3xl flex-col items-start gap-4 border border-smoke/80 p-5 shadow-2xl shadow-black/40 sm:flex-row sm:items-center sm:p-6">
+            <div class="glass-card pointer-events-auto mx-auto flex max-w-3xl flex-col items-start gap-4 border border-smoke/80 p-5 shadow-2xl shadow-black/40 sm:flex-row sm:items-center sm:p-6">
                 <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gold/30 bg-gold/10">
                     <ShieldCheck class="h-5 w-5" style="color: var(--color-gold)" />
                 </div>

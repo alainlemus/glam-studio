@@ -42,6 +42,34 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'notifications' => fn () => $this->notifications($request),
+        ];
+    }
+
+    /**
+     * Shared for every admin-area request so the notification bell stays in
+     * sync across navigations without a dedicated polling endpoint.
+     */
+    private function notifications(Request $request): ?array
+    {
+        $user = $request->user();
+
+        if (! $user || $user->isStylist()) {
+            return null;
+        }
+
+        return [
+            'unreadCount' => $user->unreadNotifications()->count(),
+            'recent' => $user->notifications()->latest()->limit(15)->get()->map(fn ($n) => [
+                'id' => $n->id,
+                'title' => $n->data['title'] ?? '',
+                'message' => $n->data['message'] ?? '',
+                'url' => $n->data['url'] ?? null,
+                'icon' => $n->data['icon'] ?? null,
+                'color' => $n->data['color'] ?? null,
+                'read' => ! is_null($n->read_at),
+                'createdAt' => $n->created_at->diffForHumans(),
+            ]),
         ];
     }
 }

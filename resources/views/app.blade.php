@@ -6,6 +6,52 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="theme-color" content="#FAF7F2">
 
+        @php
+            $siteSettings = $page['props']['site']['settings'] ?? \App\Models\SiteSetting::current();
+            $siteName = data_get($siteSettings, 'site_name') ?: config('app.name', 'Glam Studio');
+            $appName = config('app.name', 'Glam Studio');
+            $seo = $page['props']['seo'] ?? [];
+            // Misma regla que el resolver `title` de resources/js/app.ts, para que
+            // el <title> coincida exacto tanto si el SSR responde como si no.
+            $seoTitle = isset($seo['title']) ? "{$seo['title']} - {$appName}" : $appName;
+            $seoDescription = $seo['description'] ?? (data_get($siteSettings, 'footer_description') ?: 'Salón de belleza y spa con servicios de corte, coloración, uñas, spa y más. Encuentra tu sucursal más cercana y agenda tu cita en línea.');
+            $seoImage = $seo['image'] ?? data_get($siteSettings, 'logo_url');
+            $seoUrl = url()->current();
+            $seoNoindex = $seo['noindex'] ?? false;
+            $jsonLd = $page['props']['jsonLd'] ?? null;
+        @endphp
+
+        {{-- SEO: renderizado del lado del servidor para que sea visible sin ejecutar JS
+             (bots de Google, WhatsApp, Twitter, Facebook, etc.) --}}
+        <meta name="description" content="{{ $seoDescription }}">
+        <link rel="canonical" href="{{ $seoUrl }}">
+        @if ($seoNoindex)
+            <meta name="robots" content="noindex, nofollow">
+        @else
+            <meta name="robots" content="index, follow">
+        @endif
+
+        <meta property="og:type" content="{{ $seo['type'] ?? 'website' }}">
+        <meta property="og:title" content="{{ $seoTitle }}">
+        <meta property="og:description" content="{{ $seoDescription }}">
+        <meta property="og:url" content="{{ $seoUrl }}">
+        <meta property="og:site_name" content="{{ $siteName }}">
+        <meta property="og:locale" content="es_MX">
+        @if ($seoImage)
+            <meta property="og:image" content="{{ $seoImage }}">
+        @endif
+
+        <meta name="twitter:card" content="{{ $seoImage ? 'summary_large_image' : 'summary' }}">
+        <meta name="twitter:title" content="{{ $seoTitle }}">
+        <meta name="twitter:description" content="{{ $seoDescription }}">
+        @if ($seoImage)
+            <meta name="twitter:image" content="{{ $seoImage }}">
+        @endif
+
+        @if ($jsonLd)
+            <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+        @endif
+
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
             (function() {
@@ -48,7 +94,7 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         <x-inertia::head>
-            <title>{{ config('app.name', 'Salones Belleza') }}</title>
+            <title>{{ $seoTitle }}</title>
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">

@@ -8,6 +8,7 @@ defineOptions({ layout: SiteLayout });
 
 defineProps<{
     groupedBranches: Record<string, any[]>;
+    seo?: { title: string; description: string };
 }>();
 
 // Fotos únicas para cada sucursal
@@ -22,7 +23,7 @@ const branchImages: Record<number, string> = {
 </script>
 
 <template>
-    <Head title="Sucursales" />
+    <Head :title="seo?.title ?? 'Sucursales'" />
 
     <!-- HERO CON IMAGEN -->
     <section class="relative overflow-hidden border-b border-smoke bg-ink py-24 lg:py-32">
@@ -61,7 +62,7 @@ const branchImages: Record<number, string> = {
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div v-for="(branches, city) in groupedBranches" :key="city" class="mb-20 last:mb-0">
                 <!-- Header de ciudad -->
-                <div class="mb-10 flex items-center gap-4 animate-fade-in">
+                <div class="mb-10 flex items-center gap-4" v-reveal>
                     <div class="flex h-14 w-14 items-center justify-center rounded-2xl glass-card">
                         <MapPin class="h-6 w-6" style="color: var(--color-spa-lavender)" />
                     </div>
@@ -77,8 +78,8 @@ const branchImages: Record<number, string> = {
                         v-for="(branch, index) in branches"
                         :key="branch.id"
                         :href="`/sucursales/${branch.slug}`"
-                        class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:border-silver/30 animate-fade-in"
-                        :style="{ animationDelay: `${index * 100}ms` }"
+                        class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:border-silver/30"
+                        v-reveal="index * 100"
                     >
                         <!-- Imagen de la sucursal -->
                         <div class="relative aspect-[4/3] overflow-hidden">
@@ -144,7 +145,7 @@ const branchImages: Record<number, string> = {
     <!-- GALERÍA VISUAL -->
     <section class="relative overflow-hidden bg-gradient-dark py-20">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mb-12 text-center">
+            <div class="mb-12 text-center" v-reveal>
                 <p class="text-eyebrow">Ambientes únicos</p>
                 <h2 class="mt-3 font-serif text-4xl font-bold lg:text-5xl">
                     Visita nuestros <span class="italic" style="color: var(--color-silver-bright)">espacios</span>
@@ -153,7 +154,7 @@ const branchImages: Record<number, string> = {
 
             <!-- Grid de fotos de ambientes -->
             <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:gap-6">
-                <div class="group relative aspect-[4/5] overflow-hidden rounded-2xl animate-fade-in">
+                <div class="group relative aspect-[4/5] overflow-hidden rounded-2xl" v-reveal>
                     <img
                         src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&q=80"
                         alt="Interior salon 1"
@@ -166,7 +167,7 @@ const branchImages: Record<number, string> = {
                     </div>
                 </div>
 
-                <div class="group relative aspect-[4/5] overflow-hidden rounded-2xl animate-fade-in animation-delay-100">
+                <div class="group relative aspect-[4/5] overflow-hidden rounded-2xl" v-reveal="100">
                     <img
                         src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80"
                         alt="Interior salon 2"
@@ -179,7 +180,7 @@ const branchImages: Record<number, string> = {
                     </div>
                 </div>
 
-                <div class="group relative aspect-[4/5] overflow-hidden rounded-2xl animate-fade-in animation-delay-200">
+                <div class="group relative aspect-[4/5] overflow-hidden rounded-2xl" v-reveal="200">
                     <img
                         src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80"
                         alt="Interior salon 3"

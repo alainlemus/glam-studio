@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import {
     DollarSign,
     Calendar,
     ChevronDown,
     CheckCircle2,
     TrendingUp,
+    Download,
 } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { confirmDialog } from '@/composables/useConfirm';
@@ -37,6 +38,16 @@ const filter = () => {
     }, { preserveState: true });
 };
 
+const exportUrl = computed(() => {
+    const params = new URLSearchParams();
+    if (stylistId.value) params.set('stylist_id', stylistId.value);
+    if (status.value) params.set('status', status.value);
+    if (from.value) params.set('from', from.value);
+    if (to.value) params.set('to', to.value);
+    const qs = params.toString();
+    return `/admin/commissions/export${qs ? `?${qs}` : ''}`;
+});
+
 const payOne = async (id: number) => {
     if (await confirmDialog({
         title: '¿Marcar comisión como pagada?',
@@ -45,7 +56,7 @@ const payOne = async (id: number) => {
 };
 
 const payBatch = async () => {
-    const stylistName = stylists.find(s => s.id == stylistId.value)?.user?.name || 'este estilista';
+    const stylistName = props.stylists.find((s: any) => s.id == stylistId.value)?.user?.name || 'este estilista';
     const rangeFrom = from.value || '2000-01-01';
     const rangeTo = to.value || new Date().toISOString().slice(0, 10);
     const range = from.value && to.value
@@ -64,8 +75,6 @@ const payBatch = async () => {
         });
     }
 };
-
-const maxTotal = computed => Math.max(1, ...(props.byStylist || []).map(r => Number(r.total) || 0));
 </script>
 
 <template>
@@ -131,10 +140,16 @@ const maxTotal = computed => Math.max(1, ...(props.byStylist || []).map(r => Num
             </select>
             <input v-model="from" type="date" class="rounded-lg border border-smoke bg-graphite px-3 py-2.5 text-sm text-cream focus:border-silver focus:outline-none" @change="filter" />
             <input v-model="to" type="date" class="rounded-lg border border-smoke bg-graphite px-3 py-2.5 text-sm text-cream focus:border-silver focus:outline-none" @change="filter" />
-            <button v-if="stylistId" @click="payBatch" class="ml-auto btn-primary-elegant h-11 px-5">
-                <DollarSign class="h-4 w-4" />
-                Liquidar comisiones
-            </button>
+            <div class="ml-auto flex gap-3">
+                <a :href="exportUrl" class="btn-ghost-elegant h-11 px-5">
+                    <Download class="h-4 w-4" />
+                    Exportar CSV
+                </a>
+                <button v-if="stylistId" @click="payBatch" class="btn-primary-elegant h-11 px-5">
+                    <DollarSign class="h-4 w-4" />
+                    Liquidar comisiones
+                </button>
+            </div>
         </div>
 
         <div class="overflow-hidden rounded-xl border border-smoke bg-card">

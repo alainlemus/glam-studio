@@ -2,16 +2,18 @@
 import { Head, Link } from '@inertiajs/vue3';
 import SiteLayout from '@/layouts/site/SiteLayout.vue';
 import { MapPin, Phone, Mail, Clock } from '@lucide/vue';
+import BranchMap from '@/components/site/BranchMap.vue';
 
 defineOptions({ layout: SiteLayout });
 
 defineProps<{
     branches: any[];
+    seo?: { title: string; description: string };
 }>();
 </script>
 
 <template>
-    <Head title="Contacto" />
+    <Head :title="seo?.title ?? 'Contacto'" />
 
     <section class="relative overflow-hidden border-b border-smoke bg-gradient-dark py-16 lg:py-24">
         <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center animate-fade-up">
@@ -29,9 +31,10 @@ defineProps<{
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <div
-                    v-for="branch in branches"
+                    v-for="(branch, index) in branches"
                     :key="branch.id"
                     class="card-elegant p-6"
+                    v-reveal="index * 80"
                 >
                     <h3 class="font-serif text-xl font-semibold text-cream">{{ branch.name }}</h3>
                     <p class="mt-1 text-xs text-silver-bright">{{ branch.city?.name }}</p>
@@ -66,6 +69,8 @@ defineProps<{
                             </span>
                         </div>
                     </div>
+
+                    <BranchMap :branch="branch" class="mt-5" />
                 </div>
             </div>
         </div>

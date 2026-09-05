@@ -25,6 +25,7 @@ const props = defineProps<{
     reviewStats: { count: number; average: number };
     appointmentsThisMonth: number;
     preselected: { branch_id?: any; service_id?: any };
+    seo?: { title: string; description: string };
 }>();
 
 const form = ref({
@@ -164,7 +165,7 @@ const defaultStylistPhoto = 'https://images.unsplash.com/photo-1580618672591-eb1
 </script>
 
 <template>
-    <Head title="Reservar Cita" />
+    <Head :title="props.seo?.title ?? 'Reservar Cita'" />
 
     <section class="relative overflow-hidden border-b border-smoke bg-gradient-dark py-20 lg:py-32">
         <!-- Background Image con Overlay -->

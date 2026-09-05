@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\LoyaltyCard;
+use App\Support\Audit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,16 +17,22 @@ class ClientController extends Controller
     {
         $branchScope = $request->user()->branchScope();
 
-        $clients = Client::with(['loyaltyCard', 'appointments' => fn($q) => $q->latest()->limit(1)])
+        $clients = Client::with(['loyaltyCard', 'appointments' => fn ($q) => $q->latest()->limit(1)])
             ->withCount('appointments')
-            ->when($branchScope, fn($q) => $q->whereHas('appointments', fn($q2) => $q2->where('branch_id', $branchScope)))
-            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%")
+            ->when($branchScope, fn ($q) => $q->whereHas('appointments', fn ($q2) => $q2->where('branch_id', $branchScope)))
+            ->when($request->search, fn ($q) => $q->where('name', 'like', "%{$request->search}%")
                 ->orWhere('phone', 'like', "%{$request->search}%")
                 ->orWhere('email', 'like', "%{$request->search}%"))
             ->when($request->status, function ($q) use ($request) {
-                if ($request->status === 'blocked') return $q->where('is_blocked', true);
-                if ($request->status === 'vip') return $q->where('no_show_count', 0)->has('loyaltyCard');
-                if ($request->status === 'active') return $q->where('is_active', true);
+                if ($request->status === 'blocked') {
+                    return $q->where('is_blocked', true);
+                }
+                if ($request->status === 'vip') {
+                    return $q->where('no_show_count', 0)->has('loyaltyCard');
+                }
+                if ($request->status === 'active') {
+                    return $q->where('is_active', true);
+                }
             })
             ->orderBy('name')
             ->paginate(20)
@@ -73,11 +80,20 @@ class ClientController extends Controller
 
         $client->load([
             'loyaltyCard.stamps',
-            'appointments' => fn($q) => $q->with(['services.service', 'stylist.user', 'branch'])->latest()->limit(20),
-            'sales' => fn($q) => $q->with('items')->latest()->limit(20),
+            'appointments' => fn ($q) => $q->with(['services.service', 'stylist.user', 'branch'])->latest()->limit(20),
+            'sales' => fn ($q) => $q->with('items')->latest()->limit(20),
         ]);
 
         return Inertia::render('admin/clients/Show', [
+            'client' => $client,
+        ]);
+    }
+
+    public function edit(Request $request, Client $client): Response
+    {
+        $this->authorizeBranch($request, $client);
+
+        return Inertia::render('admin/clients/Form', [
             'client' => $client,
         ]);
     }
@@ -88,13 +104,21 @@ class ClientController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20|unique:clients,phone,' . $client->id,
+            'phone' => 'required|string|max:20|unique:clients,phone,'.$client->id,
             'email' => 'nullable|email|max:255',
             'birthday' => 'nullable|date',
             'notes' => 'nullable|string',
             'is_active' => 'boolean',
             'is_blocked' => 'boolean',
         ]);
+
+        $newIsBlocked = $request->boolean('is_blocked', false);
+        if ($client->is_blocked !== $newIsBlocked) {
+            $action = $newIsBlocked ? 'bloqueó' : 'desbloqueó';
+            Audit::record('status_changed', $client, "Se {$action} al cliente {$client->name}.", [
+                'is_blocked' => ['old' => $client->is_blocked, 'new' => $newIsBlocked],
+            ]);
+        }
 
         $client->update([
             'name' => $validated['name'],
@@ -103,7 +127,7 @@ class ClientController extends Controller
             'birthday' => $validated['birthday'] ?? null,
             'notes' => $validated['notes'] ?? null,
             'is_active' => $request->boolean('is_active', true),
-            'is_blocked' => $request->boolean('is_blocked', false),
+            'is_blocked' => $newIsBlocked,
         ]);
 
         return back()->with('success', 'Cliente actualizado.');
@@ -112,14 +136,16 @@ class ClientController extends Controller
     public function destroy(Request $request, Client $client): RedirectResponse
     {
         $this->authorizeBranch($request, $client);
+        Audit::record('deleted', $client, "Eliminó al cliente {$client->name} ({$client->phone}).");
         $client->delete();
+
         return back()->with('success', 'Cliente eliminado.');
     }
 
     private function authorizeBranch(Request $request, Client $client): void
     {
         $branchScope = $request->user()->branchScope();
-        if (!$branchScope) {
+        if (! $branchScope) {
             return;
         }
         abort_unless($client->appointments()->where('branch_id', $branchScope)->exists(), 403);

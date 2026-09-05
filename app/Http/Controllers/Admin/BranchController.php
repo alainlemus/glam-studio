@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\City;
+use App\Support\Audit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,10 +19,10 @@ class BranchController extends Controller
         $branchScope = $request->user()->branchScope();
 
         $branches = Branch::with('city')
-            ->when($branchScope, fn($q) => $q->where('id', $branchScope))
-            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%")
+            ->when($branchScope, fn ($q) => $q->where('id', $branchScope))
+            ->when($request->search, fn ($q) => $q->where('name', 'like', "%{$request->search}%")
                 ->orWhere('address', 'like', "%{$request->search}%"))
-            ->when($request->city_id, fn($q) => $q->where('city_id', $request->city_id))
+            ->when($request->city_id, fn ($q) => $q->where('city_id', $request->city_id))
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
@@ -62,7 +64,7 @@ class BranchController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
+        $validated['slug'] = Str::slug($validated['name']);
         $validated['is_active'] = $request->boolean('is_active', true);
 
         Branch::create($validated);
@@ -122,7 +124,9 @@ class BranchController extends Controller
     public function destroy(Request $request, Branch $branch): RedirectResponse
     {
         abort_unless($request->user()->isAdmin(), 403, 'Solo un administrador puede eliminar sucursales.');
+        Audit::record('deleted', $branch, "Eliminó la sucursal \"{$branch->name}\".");
         $branch->delete();
+
         return redirect()->route('admin.branches.index')->with('success', 'Sucursal eliminada.');
     }
 

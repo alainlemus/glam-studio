@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { Plus, Search, Wallet, Calendar, ChevronDown, AlertTriangle } from '@lucide/vue';
+import { computed, ref } from 'vue';
+import { Plus, Search, Wallet, Calendar, ChevronDown, AlertTriangle, Download } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { confirmDialog } from '@/composables/useConfirm';
 
@@ -31,6 +31,16 @@ const filter = () => {
     }, { preserveState: true });
 };
 
+const exportUrl = computed(() => {
+    const params = new URLSearchParams();
+    if (from.value) params.set('from', from.value);
+    if (to.value) params.set('to', to.value);
+    if (categoryId.value) params.set('category_id', categoryId.value);
+    if (branchId.value) params.set('branch_id', branchId.value);
+    const qs = params.toString();
+    return `/admin/expenses/export${qs ? `?${qs}` : ''}`;
+});
+
 const destroy = async (id: number) => {
     if (await confirmDialog({
         title: '¿Eliminar este egreso?',
@@ -51,10 +61,16 @@ const destroy = async (id: number) => {
                 <h2 class="mt-1 font-serif text-3xl font-medium tracking-tight">Egresos</h2>
                 <p class="mt-1 text-sm text-mercury">{{ formatPrice(total) }} · {{ expenses.total }} registros</p>
             </div>
-            <Link href="/admin/expenses/create" class="btn-primary-elegant h-12 px-5 text-sm">
-                <Plus class="h-4 w-4" />
-                Nuevo egreso
-            </Link>
+            <div class="flex gap-3">
+                <a :href="exportUrl" class="btn-ghost-elegant h-12 px-5 text-sm">
+                    <Download class="h-4 w-4" />
+                    Exportar CSV
+                </a>
+                <Link href="/admin/expenses/create" class="btn-primary-elegant h-12 px-5 text-sm">
+                    <Plus class="h-4 w-4" />
+                    Nuevo egreso
+                </Link>
+            </div>
         </div>
 
         <div class="flex flex-wrap gap-3 rounded-xl border border-smoke bg-card p-4">

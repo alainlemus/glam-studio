@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { Download } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 
 defineOptions({ layout: AppLayout });
@@ -22,6 +23,14 @@ const filter = () => {
         to: to.value || undefined,
     }, { preserveState: true });
 };
+
+const exportUrl = computed(() => {
+    const params = new URLSearchParams();
+    if (from.value) params.set('from', from.value);
+    if (to.value) params.set('to', to.value);
+    const qs = params.toString();
+    return `/admin/incomes/export${qs ? `?${qs}` : ''}`;
+});
 </script>
 
 <template>
@@ -37,6 +46,10 @@ const filter = () => {
         <div class="flex flex-wrap gap-3 rounded-xl border border-smoke bg-card p-4">
             <input v-model="from" type="date" class="rounded-lg border border-smoke bg-graphite px-3 py-2.5 text-sm text-cream focus:border-silver focus:outline-none" @change="filter" />
             <input v-model="to" type="date" class="rounded-lg border border-smoke bg-graphite px-3 py-2.5 text-sm text-cream focus:border-silver focus:outline-none" @change="filter" />
+            <a :href="exportUrl" class="btn-ghost-elegant ml-auto h-11 px-5 text-sm">
+                <Download class="h-4 w-4" />
+                Exportar CSV
+            </a>
         </div>
 
         <div class="overflow-hidden rounded-xl border border-smoke bg-card">

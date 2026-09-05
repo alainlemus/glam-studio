@@ -2,6 +2,8 @@
 import { Head, Link } from '@inertiajs/vue3';
 import SiteLayout from '@/layouts/site/SiteLayout.vue';
 import AppLogoPublic from '@/components/AppLogoPublic.vue';
+import AnimatedCounter from '@/components/site/AnimatedCounter.vue';
+import TestimonialsCarousel from '@/components/site/TestimonialsCarousel.vue';
 import {
     ChevronRight,
     Sparkles,
@@ -20,13 +22,15 @@ const props = defineProps<{
     featuredServices: any[];
     campaigns: any[];
     cities: any[];
+    testimonials: any[];
+    seo?: { title: string; description: string };
 }>();
 
 const stats = [
-    { value: `${props.branches.length}+`, label: 'Sucursales' },
-    { value: '12+', label: 'Estilistas' },
-    { value: '1000+', label: 'Clientas felices' },
-    { value: '5★', label: 'Calidad' },
+    { target: props.branches.length, suffix: '+', label: 'Sucursales' },
+    { target: 12, suffix: '+', label: 'Estilistas' },
+    { target: 1000, suffix: '+', label: 'Clientas felices' },
+    { target: 5, suffix: '★', label: 'Calidad' },
 ];
 
 const formatPrice = (price: string | number) => {
@@ -53,7 +57,7 @@ const branchImages: Record<number, string> = {
 </script>
 
 <template>
-    <Head title="Glam Studio · Belleza y Estilo" />
+    <Head :title="props.seo?.title ?? 'Glam Studio · Belleza y Estilo'" />
 
     <!-- HERO MODERNO CON IMAGEN DE FONDO -->
     <section class="relative overflow-hidden bg-ink pt-12 pb-20 lg:pt-16 lg:pb-32">
@@ -122,7 +126,9 @@ const branchImages: Record<number, string> = {
                     <!-- Social Proof Stats - Glass cards -->
                     <div class="mt-12 grid grid-cols-4 gap-4 animate-blur-fade-in animation-delay-400">
                         <div v-for="stat in stats" :key="stat.label" class="glass-effect rounded-xl p-4 text-center lg:text-left transition-all duration-300 hover:scale-105">
-                            <div class="font-serif text-2xl font-bold lg:text-3xl" style="color: var(--color-spa-lavender)">{{ stat.value }}</div>
+                            <div class="font-serif text-2xl font-bold lg:text-3xl" style="color: var(--color-spa-lavender)">
+                                <AnimatedCounter :target="stat.target" :suffix="stat.suffix" />
+                            </div>
                             <div class="mt-1 text-xs uppercase tracking-wider text-mercury">{{ stat.label }}</div>
                         </div>
                     </div>
@@ -169,7 +175,7 @@ const branchImages: Record<number, string> = {
     <!-- GALERÍA DE TRANSFORMACIONES -->
     <section class="relative border-b border-smoke bg-charcoal py-16">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mb-10 text-center animate-fade-in">
+            <div class="mb-10 text-center" v-reveal>
                 <p class="text-eyebrow">Transformaciones reales</p>
                 <h2 class="mt-3 font-serif text-4xl font-medium tracking-tight lg:text-5xl">
                     Antes y <span class="italic" style="color: var(--color-silver-bright)">después</span>
@@ -179,7 +185,7 @@ const branchImages: Record<number, string> = {
             <!-- Grid de transformaciones -->
             <div class="grid grid-cols-2 gap-4 md:grid-cols-4 lg:gap-6">
                 <!-- Transformación 1 -->
-                <div class="group relative overflow-hidden rounded-2xl aspect-[3/4] animate-fade-in">
+                <div class="group relative overflow-hidden rounded-2xl aspect-[3/4]" v-reveal>
                     <img
                         src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80"
                         alt="Transformation 1"
@@ -194,7 +200,7 @@ const branchImages: Record<number, string> = {
                 </div>
 
                 <!-- Transformación 2 -->
-                <div class="group relative overflow-hidden rounded-2xl aspect-[3/4] animate-fade-in animation-delay-100">
+                <div class="group relative overflow-hidden rounded-2xl aspect-[3/4]" v-reveal="100">
                     <img
                         src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80"
                         alt="Transformation 2"
@@ -209,7 +215,7 @@ const branchImages: Record<number, string> = {
                 </div>
 
                 <!-- Transformación 3 -->
-                <div class="group relative overflow-hidden rounded-2xl aspect-[3/4] animate-fade-in animation-delay-200">
+                <div class="group relative overflow-hidden rounded-2xl aspect-[3/4]" v-reveal="200">
                     <img
                         src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&q=80"
                         alt="Transformation 3"
@@ -224,7 +230,7 @@ const branchImages: Record<number, string> = {
                 </div>
 
                 <!-- Transformación 4 -->
-                <div class="group relative overflow-hidden rounded-2xl aspect-[3/4] animate-fade-in animation-delay-300">
+                <div class="group relative overflow-hidden rounded-2xl aspect-[3/4]" v-reveal="300">
                     <img
                         src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80"
                         alt="Transformation 4"
@@ -244,7 +250,7 @@ const branchImages: Record<number, string> = {
     <!-- SERVICIOS DESTACADOS CON IMÁGENES -->
     <section class="bg-ink py-20 lg:py-28">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
+            <div class="text-center" v-reveal>
                 <p class="text-eyebrow">Lo que ofrecemos</p>
                 <h2 class="mt-3 font-serif text-4xl font-medium tracking-tight lg:text-5xl">
                     Servicios <span class="italic" style="color: var(--color-spa-lavender)">premium</span>
@@ -259,8 +265,8 @@ const branchImages: Record<number, string> = {
                     v-for="(category, index) in serviceCategories.slice(0, 8)"
                     :key="category.id"
                     href="/servicios"
-                    class="group soft-ui relative overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:border-silver/30 animate-fade-in"
-                    :style="{ animationDelay: `${index * 100}ms` }"
+                    class="group soft-ui relative overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:border-silver/30"
+                    v-reveal="index * 100"
                 >
                     <!-- Imagen de fondo -->
                     <div class="relative h-48 overflow-hidden">
@@ -304,7 +310,7 @@ const branchImages: Record<number, string> = {
     <!-- SUCURSALES CON IMÁGENES -->
     <section class="bg-gradient-onyx py-20 lg:py-28">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col items-end justify-between gap-4 sm:flex-row sm:items-end">
+            <div class="flex flex-col items-end justify-between gap-4 sm:flex-row sm:items-end" v-reveal>
                 <div>
                     <p class="text-eyebrow">Encuentra tu salón</p>
                     <h2 class="mt-3 font-serif text-4xl font-medium tracking-tight lg:text-5xl">
@@ -321,8 +327,8 @@ const branchImages: Record<number, string> = {
                     v-for="(branch, index) in branches.slice(0, 6)"
                     :key="branch.id"
                     :href="`/sucursales/${branch.slug}`"
-                    class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:border-silver/30 animate-fade-in"
-                    :style="{ animationDelay: `${index * 100}ms` }"
+                    class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:border-silver/30"
+                    v-reveal="index * 100"
                 >
                     <!-- Imagen de la sucursal -->
                     <div class="relative aspect-[4/3] overflow-hidden">
@@ -366,7 +372,7 @@ const branchImages: Record<number, string> = {
         </div>
 
         <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
+            <div class="text-center" v-reveal>
                 <p class="text-eyebrow">Ofertas especiales</p>
                 <h2 class="mt-3 font-serif text-4xl font-medium tracking-tight lg:text-5xl">
                     <span class="italic" style="color: var(--color-gold)">Promociones</span> vigentes
@@ -375,9 +381,10 @@ const branchImages: Record<number, string> = {
 
             <div class="mt-14 grid gap-6 md:grid-cols-3">
                 <div
-                    v-for="campaign in campaigns"
+                    v-for="(campaign, index) in campaigns"
                     :key="campaign.id"
                     class="glass-card relative overflow-hidden p-8 transition-all duration-300 hover:scale-105"
+                    v-reveal="index * 100"
                 >
                     <div class="absolute right-0 top-0 h-32 w-32 -translate-y-1/2 translate-x-1/2 rounded-full blur-2xl" style="background: var(--color-spa-lavender); opacity: 0.1;"></div>
                     <span class="chip glass-effect text-silver-bright text-xs uppercase tracking-widest">
@@ -398,10 +405,24 @@ const branchImages: Record<number, string> = {
         </div>
     </section>
 
+    <!-- TESTIMONIOS -->
+    <section v-if="testimonials.length" class="bg-charcoal py-20 lg:py-28">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="mb-14 text-center" v-reveal>
+                <p class="text-eyebrow">Lo que dicen de nosotras</p>
+                <h2 class="mt-3 font-serif text-4xl font-medium tracking-tight lg:text-5xl">
+                    Clientas <span class="italic" style="color: var(--color-gold)">felices</span>
+                </h2>
+            </div>
+
+            <TestimonialsCarousel :testimonials="testimonials" />
+        </div>
+    </section>
+
     <!-- CTA FINAL -->
     <section class="bg-ink py-20 lg:py-28">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <div class="relative overflow-hidden rounded-3xl glass-card p-10 text-center shadow-gold-lg lg:p-16">
+            <div class="relative overflow-hidden rounded-3xl glass-card p-10 text-center shadow-gold-lg lg:p-16" v-reveal>
                 <div class="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full blur-3xl" style="background: var(--color-spa-lavender); opacity: 0.1;"></div>
                 <div class="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full blur-3xl" style="background: var(--color-gold); opacity: 0.12;"></div>
 

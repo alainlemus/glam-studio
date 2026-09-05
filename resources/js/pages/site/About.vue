@@ -2,17 +2,19 @@
 import { Head, Link } from '@inertiajs/vue3';
 import SiteLayout from '@/layouts/site/SiteLayout.vue';
 import { Sparkles, Award, Users, Heart, Star } from '@lucide/vue';
+import AnimatedCounter from '@/components/site/AnimatedCounter.vue';
 
 defineOptions({ layout: SiteLayout });
 
 defineProps<{
     stats: any;
     cities: any[];
+    seo?: { title: string; description: string };
 }>();
 </script>
 
 <template>
-    <Head title="Nosotros" />
+    <Head :title="seo?.title ?? 'Nosotros'" />
 
     <!-- HERO CON IMAGEN HERO -->
     <section class="relative overflow-hidden border-b border-smoke bg-ink py-24 lg:py-32">
@@ -51,24 +53,24 @@ defineProps<{
     <section class="py-20 lg:py-28">
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105 animate-fade-in">
+                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105" v-reveal>
                     <Sparkles class="mx-auto h-10 w-10 animate-sparkle" style="color: var(--color-spa-lavender)" />
-                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)">{{ stats.branches }}+</div>
+                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)"><AnimatedCounter :target="stats.branches" suffix="+" /></div>
                     <div class="mt-2 text-xs uppercase tracking-wider text-mercury">Sucursales</div>
                 </div>
-                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105 animate-fade-in animation-delay-100">
+                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105" v-reveal="100">
                     <Users class="mx-auto h-10 w-10" style="color: var(--color-spa-lavender)" />
-                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)">{{ stats.stylists }}+</div>
+                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)"><AnimatedCounter :target="stats.stylists" suffix="+" /></div>
                     <div class="mt-2 text-xs uppercase tracking-wider text-mercury">Estilistas</div>
                 </div>
-                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105 animate-fade-in animation-delay-200">
+                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105" v-reveal="200">
                     <Award class="mx-auto h-10 w-10" style="color: var(--color-spa-lavender)" />
-                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)">{{ stats.services }}+</div>
+                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)"><AnimatedCounter :target="stats.services" suffix="+" /></div>
                     <div class="mt-2 text-xs uppercase tracking-wider text-mercury">Servicios</div>
                 </div>
-                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105 animate-fade-in animation-delay-300">
+                <div class="glass-card p-8 text-center transition-all duration-300 hover:scale-105" v-reveal="300">
                     <Star class="mx-auto h-10 w-10" style="color: var(--color-spa-lavender)" />
-                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)">{{ stats.clients }}+</div>
+                    <div class="mt-4 font-serif text-5xl font-bold" style="color: var(--color-gold)"><AnimatedCounter :target="stats.clients" suffix="+" /></div>
                     <div class="mt-2 text-xs uppercase tracking-wider text-mercury">Clientes felices</div>
                 </div>
             </div>
@@ -84,7 +86,7 @@ defineProps<{
         <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid items-center gap-12 lg:grid-cols-2">
                 <!-- Texto -->
-                <div class="animate-blur-fade-in">
+                <div v-reveal>
                     <p class="text-eyebrow">Nuestra misión</p>
                     <h2 class="mt-3 font-serif text-4xl font-bold lg:text-5xl">
                         Pasión por la <span class="italic" style="color: var(--color-silver-bright)">belleza</span>
@@ -105,7 +107,7 @@ defineProps<{
                 </div>
 
                 <!-- Imagen -->
-                <div class="relative animate-blur-fade-in animation-delay-200">
+                <div class="relative" v-reveal="150">
                     <div class="relative overflow-hidden rounded-3xl">
                         <img
                             src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80"
@@ -139,7 +141,7 @@ defineProps<{
     <!-- GALERÍA DEL EQUIPO -->
     <section class="bg-ink py-20 lg:py-28">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mb-12 text-center">
+            <div class="mb-12 text-center" v-reveal>
                 <p class="text-eyebrow">Conoce al equipo</p>
                 <h2 class="mt-3 font-serif text-4xl font-bold lg:text-5xl">
                     Nuestros <span class="italic" style="color: var(--color-silver-bright)">profesionales</span>
@@ -148,7 +150,7 @@ defineProps<{
 
             <!-- Grid de estilistas -->
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in">
+                <div class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2" v-reveal>
                     <div class="relative aspect-[3/4] overflow-hidden">
                         <img
                             src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400&q=80"
@@ -164,7 +166,7 @@ defineProps<{
                     </div>
                 </div>
 
-                <div class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in animation-delay-100">
+                <div class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2" v-reveal="100">
                     <div class="relative aspect-[3/4] overflow-hidden">
                         <img
                             src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=400&q=80"
@@ -180,7 +182,7 @@ defineProps<{
                     </div>
                 </div>
 
-                <div class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in animation-delay-200">
+                <div class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2" v-reveal="200">
                     <div class="relative aspect-[3/4] overflow-hidden">
                         <img
                             src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"
@@ -196,7 +198,7 @@ defineProps<{
                     </div>
                 </div>
 
-                <div class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2 animate-fade-in animation-delay-300">
+                <div class="group soft-ui overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-2" v-reveal="300">
                     <div class="relative aspect-[3/4] overflow-hidden">
                         <img
                             src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=80"
@@ -218,7 +220,7 @@ defineProps<{
     <!-- CIUDADES -->
     <section class="bg-gradient-dark py-20 lg:py-28">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mb-12 text-center">
+            <div class="mb-12 text-center" v-reveal>
                 <p class="text-eyebrow">Presencia</p>
                 <h2 class="mt-3 font-serif text-4xl font-bold lg:text-5xl">
                     Ciudades donde <span class="italic" style="color: var(--color-silver-bright)">estamos</span>
@@ -226,7 +228,7 @@ defineProps<{
             </div>
 
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div v-for="(city, index) in cities" :key="city.id" class="glass-card p-6 text-center transition-all duration-300 hover:scale-105 animate-fade-in" :style="{ animationDelay: `${index * 100}ms` }">
+                <div v-for="(city, index) in cities" :key="city.id" class="glass-card p-6 text-center transition-all duration-300 hover:scale-105" v-reveal="index * 100">
                     <div class="text-4xl">📍</div>
                     <div class="mt-3 font-serif text-xl font-bold text-cream">{{ city.name }}</div>
                     <div class="mt-1 text-sm text-mercury">{{ city.branches_count }} sucursal{{ city.branches_count > 1 ? 'es' : '' }}</div>

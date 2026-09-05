@@ -8,16 +8,23 @@ use App\Models\AppointmentService;
 use App\Models\Branch;
 use App\Models\Client;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\SiteSetting;
 use App\Models\Stylist;
 use App\Models\StylistSchedule;
 use App\Models\Testimonial;
 use App\Models\User;
+use App\Notifications\NewAppointmentNotification;
+use App\Services\WhatsAppService;
+use App\Support\NotificationRecipients;
+use App\Support\Seo;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -27,7 +34,7 @@ class PublicAppointmentController extends Controller
     {
         $branches = Branch::with('city')->active()->get();
         $services = Service::with('category')->active()->get();
-        $categories = \App\Models\ServiceCategory::with(['services' => fn($q) => $q->active()])
+        $categories = ServiceCategory::with(['services' => fn ($q) => $q->active()])
             ->active()
             ->orderBy('sort_order')
             ->get();
@@ -53,6 +60,10 @@ class PublicAppointmentController extends Controller
                 'branch_id' => $request->query('branch'),
                 'service_id' => $request->query('service'),
             ],
+            'seo' => Seo::make(
+                'Agenda tu Cita',
+                'Reserva tu cita en línea en Glam Studio. Elige sucursal, servicio, estilista y horario disponible en minutos.',
+            ),
         ]);
     }
 
@@ -70,19 +81,19 @@ class PublicAppointmentController extends Controller
         // Normalizar start_time: aceptar "H:i" o "H:i:s"
         $request->merge([
             'start_time' => preg_match('/^\d{2}:\d{2}$/', $request->input('start_time'))
-                ? $request->input('start_time') . ':00'
+                ? $request->input('start_time').':00'
                 : $request->input('start_time'),
         ]);
 
         $service = Service::findOrFail($validated['service_id']);
         $branch = Branch::findOrFail($validated['branch_id']);
-        $date = \Carbon\Carbon::parse($validated['date']);
+        $date = Carbon::parse($validated['date']);
         $dayOfWeek = $date->dayOfWeek;
 
         $stylistQuery = Stylist::where('branch_id', $branch->id)
             ->active();
 
-        if (!empty($validated['stylist_id'])) {
+        if (! empty($validated['stylist_id'])) {
             $stylistQuery->where('id', $validated['stylist_id']);
         }
 
@@ -95,7 +106,9 @@ class PublicAppointmentController extends Controller
                 ->where('is_active', true)
                 ->first();
 
-            if (!$schedule) continue;
+            if (! $schedule) {
+                continue;
+            }
 
             $slots = array_merge($slots, $this->generateSlotsForStylist(
                 $stylist, $schedule, $date, $service
@@ -107,7 +120,7 @@ class PublicAppointmentController extends Controller
                 ->unique('start')
                 ->sortBy('start')
                 ->values(),
-            'stylists' => $stylists->map(fn($s) => [
+            'stylists' => $stylists->map(fn ($s) => [
                 'id' => $s->id,
                 'name' => $s->user?->name,
                 'specialty' => $s->specialty,
@@ -115,18 +128,18 @@ class PublicAppointmentController extends Controller
         ]);
     }
 
-    private function generateSlotsForStylist(Stylist $stylist, StylistSchedule $schedule, \Carbon\Carbon $date, Service $service): array
+    private function generateSlotsForStylist(Stylist $stylist, StylistSchedule $schedule, Carbon $date, Service $service): array
     {
         $slots = [];
-        $start = \Carbon\Carbon::parse($date->format('Y-m-d') . ' ' . $schedule->start_time);
-        $end = \Carbon\Carbon::parse($date->format('Y-m-d') . ' ' . $schedule->end_time);
+        $start = Carbon::parse($date->format('Y-m-d').' '.$schedule->start_time);
+        $end = Carbon::parse($date->format('Y-m-d').' '.$schedule->end_time);
 
         $booked = Appointment::where('branch_id', $stylist->branch_id)
             ->whereDate('date', $date)
             ->whereNotIn('status', ['cancelled', 'no_show'])
             ->where(function ($q) use ($stylist) {
                 $q->where('stylist_id', $stylist->id)
-                  ->orWhereNull('stylist_id');
+                    ->orWhereNull('stylist_id');
             })
             ->get(['start_time', 'end_time']);
 
@@ -139,7 +152,7 @@ class PublicAppointmentController extends Controller
                 return $apt->start_time < $slotEnd && $apt->end_time > $slotStart;
             });
 
-            if (!$isPast && !$isBooked) {
+            if (! $isPast && ! $isBooked) {
                 $slots[] = [
                     'start' => $slotStart,
                     'end' => $slotEnd,
@@ -159,7 +172,7 @@ class PublicAppointmentController extends Controller
         // Normalizar start_time ANTES de validar: aceptar "H:i" o "H:i:s"
         $startTimeRaw = $request->input('start_time');
         if ($startTimeRaw && preg_match('/^\d{2}:\d{2}$/', $startTimeRaw)) {
-            $request->merge(['start_time' => $startTimeRaw . ':00']);
+            $request->merge(['start_time' => $startTimeRaw.':00']);
         }
 
         $validated = $request->validate([
@@ -187,7 +200,7 @@ class PublicAppointmentController extends Controller
             $client->update(['email' => $validated['email']]);
         }
 
-        if (!$client->canBook()) {
+        if (! $client->canBook()) {
             return back()->withErrors(['phone' => 'Lo sentimos, no puedes agendar citas. Contacta a la sucursal.']);
         }
 
@@ -206,7 +219,7 @@ class PublicAppointmentController extends Controller
 
         if ($conflict) {
             return back()->withErrors([
-                'start_time' => 'Ese horario ya no está disponible. Por favor elige otro.'
+                'start_time' => 'Ese horario ya no está disponible. Por favor elige otro.',
             ])->withInput();
         }
 
@@ -255,11 +268,21 @@ class PublicAppointmentController extends Controller
 
         $appointment->load(['client', 'services.service', 'branch', 'stylist.user']);
 
+        Notification::send(
+            NotificationRecipients::forBranch($appointment->branch_id),
+            new NewAppointmentNotification($appointment),
+        );
+
         $this->sendConfirmationEmails($appointment);
 
         return Inertia::render('site/BookSuccess', [
             'appointment' => $appointment,
-            'whatsappUrl' => \App\Services\WhatsAppService::linkForPhone($branch->whatsapp, $whatsappMessage),
+            'whatsappUrl' => WhatsAppService::linkForPhone($branch->whatsapp, $whatsappMessage),
+            'seo' => Seo::make(
+                'Cita Reservada',
+                'Tu cita ha sido reservada exitosamente en Glam Studio.',
+                ['noindex' => true],
+            ),
         ]);
     }
 
@@ -296,7 +319,7 @@ class PublicAppointmentController extends Controller
                 ? [$notificationEmail]
                 : User::where('role', User::ROLE_ADMIN)->pluck('email')->all();
 
-            if (!empty($staffRecipients)) {
+            if (! empty($staffRecipients)) {
                 Mail::to($staffRecipients)
                     ->send(new AppointmentBooked($appointment, forStaff: true));
             }

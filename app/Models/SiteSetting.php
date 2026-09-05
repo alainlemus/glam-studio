@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class SiteSetting extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'site_name', 'tagline', 'footer_description', 'notification_email', 'logo_path',
         'instagram_url', 'facebook_url', 'tiktok_url', 'privacy_policy', 'privacy_policy_updated_at',
@@ -15,6 +18,13 @@ class SiteSetting extends Model
     protected $casts = [
         'privacy_policy_updated_at' => 'datetime',
     ];
+
+    /**
+     * Without this, `logo_url` (derived from `logo_path`) never reaches the
+     * frontend via Inertia/JSON serialization, so an uploaded logo would
+     * never actually render anywhere on the site.
+     */
+    protected $appends = ['logo_url'];
 
     /**
      * There is always exactly one settings row. Fetch it, creating it

@@ -3,23 +3,29 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\Branch;
 use App\Models\Client;
 use App\Models\Commission;
+use App\Models\Income;
 use App\Models\Product;
+use App\Models\ProductStock;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Service;
 use App\Models\Stylist;
+use App\Support\Audit;
+use App\Support\CsvExport;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SaleController extends Controller
 {
-    public function index(Request $request): Response
+    private function filteredQuery(Request $request)
     {
         $branchScope = $request->user()->branchScope();
 
@@ -40,11 +46,19 @@ class SaleController extends Controller
             $query->where('status', $request->status);
         }
 
+        return $query;
+    }
+
+    public function index(Request $request): Response
+    {
+        $branchScope = $request->user()->branchScope();
+        $query = $this->filteredQuery($request);
+
         $sales = $query->latest()->paginate(20)->withQueryString();
 
         return Inertia::render('admin/sales/Index', [
             'sales' => $sales,
-            'branches' => Branch::active()->when($branchScope, fn($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
+            'branches' => Branch::active()->when($branchScope, fn ($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
             'filters' => $request->only(['from', 'to', 'branch_id', 'status']),
             'summary' => [
                 'total' => (clone $query)->sum('total'),
@@ -59,12 +73,12 @@ class SaleController extends Controller
 
         return Inertia::render('admin/sales/Form', [
             'clients' => Client::orderBy('name')->limit(200)->get(),
-            'branches' => Branch::active()->when($branchScope, fn($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
+            'branches' => Branch::active()->when($branchScope, fn ($q) => $q->where('id', $branchScope))->orderBy('name')->get(),
             'services' => Service::with('category')->active()->get(),
             'products' => Product::with('category')->active()->get(),
-            'stylists' => Stylist::with('user')->active()->when($branchScope, fn($q) => $q->where('branch_id', $branchScope))->get(),
+            'stylists' => Stylist::with('user')->active()->when($branchScope, fn ($q) => $q->where('branch_id', $branchScope))->get(),
             'appointment' => $request->appointment_id
-                ? \App\Models\Appointment::with(['client', 'services.service', 'branch', 'stylist'])->find($request->appointment_id)
+                ? Appointment::with(['client', 'services.service', 'branch', 'stylist'])->find($request->appointment_id)
                 : null,
         ]);
     }
@@ -145,7 +159,7 @@ class SaleController extends Controller
             }
 
             if ($item['type'] === 'product') {
-                $stock = \App\Models\ProductStock::where('product_id', $model->id)
+                $stock = ProductStock::where('product_id', $model->id)
                     ->where('branch_id', $validated['branch_id'])
                     ->first();
                 if ($stock) {
@@ -159,10 +173,10 @@ class SaleController extends Controller
             'total' => $subtotal - ($validated['discount'] ?? 0),
         ]);
 
-        \App\Models\Income::create([
+        Income::create([
             'branch_id' => $validated['branch_id'],
             'sale_id' => $sale->id,
-            'concept' => 'Venta ' . $sale->ticket_number,
+            'concept' => 'Venta '.$sale->ticket_number,
             'amount' => $sale->total,
             'income_date' => Carbon::today(),
             'source' => 'sale',
@@ -186,6 +200,28 @@ class SaleController extends Controller
         ]);
     }
 
+    public function export(Request $request): StreamedResponse
+    {
+        $sales = $this->filteredQuery($request)->latest()->get();
+
+        return CsvExport::download(
+            'ventas-'.now()->format('Y-m-d').'.csv',
+            ['Ticket', 'Fecha', 'Cliente', 'Estilista', 'Sucursal', 'Método de pago', 'Estatus', 'Subtotal', 'Descuento', 'Total'],
+            $sales->map(fn (Sale $sale) => [
+                $sale->ticket_number,
+                $sale->created_at->format('Y-m-d H:i'),
+                $sale->client?->name ?? 'Público general',
+                $sale->stylist?->user?->name ?? '—',
+                $sale->branch?->name,
+                $sale->payment_method,
+                $sale->status,
+                number_format((float) $sale->subtotal, 2, '.', ''),
+                number_format((float) $sale->discount, 2, '.', ''),
+                number_format((float) $sale->total, 2, '.', ''),
+            ]),
+        );
+    }
+
     public function ticket(Request $request, Sale $sale): Response
     {
         $this->authorizeBranch($request, $sale);
@@ -200,8 +236,10 @@ class SaleController extends Controller
     public function destroy(Request $request, Sale $sale): RedirectResponse
     {
         $this->authorizeBranch($request, $sale);
+        Audit::record('cancelled', $sale, "Canceló la venta {$sale->ticket_number} por $".number_format($sale->total, 2).'.');
         $sale->update(['status' => 'cancelled']);
         $sale->commissions()->update(['status' => 'cancelled']);
+
         return back()->with('success', 'Venta cancelada.');
     }
 

@@ -8,6 +8,7 @@ defineOptions({ layout: SiteLayout });
 defineProps<{
     appointment: any;
     whatsappUrl: string;
+    seo?: { title: string; description: string };
 }>();
 
 const formatPrice = (price: string | number) => {
@@ -21,7 +22,7 @@ const formatDate = (date: string) => {
 </script>
 
 <template>
-    <Head title="¡Cita reservada!" />
+    <Head :title="seo?.title ?? '¡Cita reservada!'" />
 
     <section class="relative overflow-hidden border-b border-smoke bg-gradient-dark py-16 lg:py-24">
         <div class="pointer-events-none absolute inset-0">

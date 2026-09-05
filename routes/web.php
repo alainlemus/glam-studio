@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AppointmentController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\ClientController;
@@ -13,8 +14,9 @@ use App\Http\Controllers\Admin\IncomeController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\LoyaltyController;
 use App\Http\Controllers\Admin\MarketingController;
-use App\Http\Controllers\Admin\ProductCategoryController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PrivacyPolicyController;
+use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\ServiceCategoryController;
@@ -25,7 +27,12 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PublicAppointmentController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\WhatsAppWebhookController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 
 // Public site
 Route::get('/', [SiteController::class, 'home'])->name('home');
@@ -51,19 +58,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
         if (auth()->user()->isReceptionist()) {
             return redirect()->route('admin.appointments.calendar');
         }
-        return redirect()->route('admin.stylist.dashboard');
+
+        // No hay panel dedicado para estilistas todavía; se les envía a su perfil
+        // en lugar de a una ruta inexistente para evitar un error 500.
+        return redirect()->route('profile.edit');
     })->name('dashboard');
 });
 
 // WhatsApp Webhook
-Route::get('/webhook/whatsapp', [\App\Http\Controllers\WhatsAppWebhookController::class, 'verify'])->name('webhook.whatsapp.verify');
-Route::post('/webhook/whatsapp', [\App\Http\Controllers\WhatsAppWebhookController::class, 'webhook'])->name('webhook.whatsapp');
+Route::get('/webhook/whatsapp', [WhatsAppWebhookController::class, 'verify'])->name('webhook.whatsapp.verify');
+Route::post('/webhook/whatsapp', [WhatsAppWebhookController::class, 'webhook'])->name('webhook.whatsapp');
 
 // Admin Panel
 Route::middleware(['auth', 'verified', 'role:admin,manager,receptionist,stylist'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+
+        Route::post('notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read_all');
 
         // Citas, agenda, marketing y clientes: admin, gerente y recepcionista
         // (todo se filtra por sucursal para gerente/recepcionista, ver branchScope()).
@@ -77,7 +90,9 @@ Route::middleware(['auth', 'verified', 'role:admin,manager,receptionist,stylist'
 
             Route::resource('clients', ClientController::class);
 
-            Route::resource('marketing', MarketingController::class);
+            Route::resource('marketing', MarketingController::class)
+                ->except(['show'])
+                ->parameters(['marketing' => 'campaign']);
             Route::post('marketing/{campaign}/activate', [MarketingController::class, 'activate'])->name('marketing.activate');
             Route::post('marketing/{campaign}/send', [MarketingController::class, 'send'])->name('marketing.send');
         });
@@ -88,16 +103,22 @@ Route::middleware(['auth', 'verified', 'role:admin,manager,receptionist,stylist'
 
             // Sucursales y Ciudades
             Route::resource('branches', BranchController::class);
-            Route::resource('cities', CityController::class);
-            Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show']);
+            Route::resource('cities', CityController::class)->except(['show', 'edit']);
+            Route::resource('expense-categories', ExpenseCategoryController::class)
+                ->except(['show', 'create', 'edit'])
+                ->parameters(['expense-categories' => 'category']);
 
             // Servicios
-            Route::resource('services', ServiceController::class);
-            Route::resource('service-categories', ServiceCategoryController::class);
+            Route::resource('services', ServiceController::class)->except(['show']);
+            Route::resource('service-categories', ServiceCategoryController::class)
+                ->except(['show', 'create', 'edit'])
+                ->parameters(['service-categories' => 'category']);
 
             // Productos e Inventario
-            Route::resource('products', ProductController::class);
-            Route::resource('product-categories', ProductCategoryController::class);
+            Route::resource('products', ProductController::class)->except(['show']);
+            Route::resource('product-categories', ProductCategoryController::class)
+                ->except(['show', 'create', 'edit'])
+                ->parameters(['product-categories' => 'category']);
             Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
             Route::post('inventory/{product}/{branch}/adjust', [InventoryController::class, 'adjust'])->name('inventory.adjust');
             Route::post('inventory/transfer', [InventoryController::class, 'transfer'])->name('inventory.transfer');
@@ -106,18 +127,22 @@ Route::middleware(['auth', 'verified', 'role:admin,manager,receptionist,stylist'
             Route::resource('stylists', StylistController::class);
 
             // Ventas
-            Route::resource('sales', SaleController::class);
+            Route::get('sales/export', [SaleController::class, 'export'])->name('sales.export');
+            Route::resource('sales', SaleController::class)->except(['edit', 'update']);
             Route::get('sales/{sale}/ticket', [SaleController::class, 'ticket'])->name('sales.ticket');
 
             // Comisiones
             Route::get('commissions', [CommissionController::class, 'index'])->name('commissions.index');
+            Route::get('commissions/export', [CommissionController::class, 'export'])->name('commissions.export');
             Route::post('commissions/{commission}/pay', [CommissionController::class, 'pay'])->name('commissions.pay');
             Route::post('commissions/pay-batch', [CommissionController::class, 'payBatch'])->name('commissions.pay_batch');
 
             // Finanzas
             Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
-            Route::resource('expenses', ExpenseController::class);
-            Route::resource('incomes', IncomeController::class);
+            Route::get('expenses/export', [ExpenseController::class, 'export'])->name('expenses.export');
+            Route::resource('expenses', ExpenseController::class)->except(['show']);
+            Route::get('incomes/export', [IncomeController::class, 'export'])->name('incomes.export');
+            Route::resource('incomes', IncomeController::class)->only(['index', 'destroy']);
 
             // Lealtad
             Route::get('loyalty', [LoyaltyController::class, 'index'])->name('loyalty.index');
@@ -137,6 +162,8 @@ Route::middleware(['auth', 'verified', 'role:admin,manager,receptionist,stylist'
 
             Route::get('privacy-policy', [PrivacyPolicyController::class, 'edit'])->name('privacy-policy.edit');
             Route::put('privacy-policy', [PrivacyPolicyController::class, 'update'])->name('privacy-policy.update');
+
+            Route::get('audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
         });
     });
 

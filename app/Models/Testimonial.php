@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Testimonial extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'client_name', 'quote', 'rating', 'photo_path', 'is_active', 'sort_order',
     ];

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { User, Phone, Mail, Calendar, AlertTriangle, Award, Gift, ExternalLink, ChevronLeft } from '@lucide/vue';
+import { User, Phone, Mail, Calendar, AlertTriangle, Award, Gift, ExternalLink, ChevronLeft, Pencil } from '@lucide/vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 
 defineOptions({ layout: AppLayout });
@@ -22,10 +22,16 @@ const formatPrice = (p: any) => new Intl.NumberFormat('es-MX', { style: 'currenc
             <div class="absolute -left-16 -bottom-16 h-64 w-64 rounded-full bg-gradient-to-tl from-purple-500/5 to-transparent blur-3xl"></div>
 
             <div class="relative">
-                <Link href="/admin/clients" class="inline-flex items-center gap-2 text-sm font-medium text-silver-bright transition-colors hover:text-cream">
-                    <ChevronLeft class="h-4 w-4" />
-                    Volver a clientes
-                </Link>
+                <div class="flex items-center justify-between">
+                    <Link href="/admin/clients" class="inline-flex items-center gap-2 text-sm font-medium text-silver-bright transition-colors hover:text-cream">
+                        <ChevronLeft class="h-4 w-4" />
+                        Volver a clientes
+                    </Link>
+                    <Link :href="`/admin/clients/${client.id}/edit`" class="btn-ghost-elegant h-10 px-4 text-sm">
+                        <Pencil class="h-3.5 w-3.5" />
+                        Editar
+                    </Link>
+                </div>
                 <div class="mt-6 flex items-start gap-6">
                     <div class="group relative flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-silver/20 to-silver/10 shadow-lg shadow-silver/10 transition-all duration-300 hover:scale-105">
                         <User class="h-10 w-10 text-silver-bright" />

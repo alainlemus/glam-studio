@@ -10,6 +10,8 @@ import {
 import SiteFooter from '@/components/site/SiteFooter.vue';
 import AppLogoPublic from '@/components/AppLogoPublic.vue';
 import CookieConsentBanner from '@/components/site/CookieConsentBanner.vue';
+import FloatingWhatsApp from '@/components/site/FloatingWhatsApp.vue';
+import BackToTop from '@/components/site/BackToTop.vue';
 
 const props = defineProps<{
     variant?: 'transparent' | 'solid';
@@ -114,5 +116,7 @@ const isActive = (href: string) => {
 
         <SiteFooter />
         <CookieConsentBanner />
+        <BackToTop />
+        <FloatingWhatsApp />
     </div>
 </template>

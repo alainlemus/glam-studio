@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import SiteLayout from '@/layouts/site/SiteLayout.vue';
-import { MapPin, Phone, Clock, ChevronLeft, Scissors } from '@lucide/vue';
+import { MapPin, Phone, Clock, ChevronLeft } from '@lucide/vue';
+import BranchMap from '@/components/site/BranchMap.vue';
 
 defineOptions({ layout: SiteLayout });
 
 defineProps<{
     branch: any;
     stylists: any[];
+    seo?: { title: string; description: string };
 }>();
 </script>
 
 <template>
-    <Head :title="branch.name" />
+    <Head :title="seo?.title ?? branch.name" />
 
     <section class="relative overflow-hidden border-b border-smoke bg-gradient-dark py-12 lg:py-16">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -76,16 +78,9 @@ defineProps<{
                     </div>
                 </div>
 
-                <div class="relative flex items-center justify-center">
-                    <div class="absolute h-72 w-72 rounded-full bg-silver/10 blur-3xl lg:h-96 lg:w-96"></div>
-                    <div class="relative aspect-square w-full max-w-md overflow-hidden rounded-2xl border border-silver/30 bg-gradient-to-br from-graphite to-ink shadow-gold-lg">
-                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.2),transparent_70%)]"></div>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <Scissors class="h-24 w-24 text-silver-bright opacity-30" />
-                            <div class="mt-4 font-serif text-2xl text-glitter">{{ branch.name }}</div>
-                            <div class="mt-2 text-sm text-mercury">{{ branch.city?.name }}</div>
-                        </div>
-                    </div>
+                <div class="relative">
+                    <div class="pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-silver/10 blur-3xl"></div>
+                    <BranchMap :branch="branch" class="shadow-gold-lg" />
                 </div>
             </div>
         </div>
@@ -101,7 +96,7 @@ defineProps<{
             </div>
 
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                <div v-for="stylist in stylists" :key="stylist.id" class="card-elegant card-elegant-hover p-6 text-center">
+                <div v-for="(stylist, index) in stylists" :key="stylist.id" class="card-elegant card-elegant-hover p-6 text-center" v-reveal="index * 80">
                     <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-silver/30 bg-gradient-to-br from-silver-bright/20 to-graphite text-3xl">
                         👩‍🎨
                     </div>

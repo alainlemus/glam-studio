@@ -9,6 +9,7 @@ defineOptions({ layout: SiteLayout });
 const props = defineProps<{
     content: string | null;
     updatedAt: string | null;
+    seo?: { title: string; description: string };
 }>();
 
 const formattedDate = computed(() => {
@@ -22,7 +23,7 @@ const formattedDate = computed(() => {
 </script>
 
 <template>
-    <Head title="Aviso de privacidad" />
+    <Head :title="props.seo?.title ?? 'Aviso de privacidad'" />
 
     <section class="relative overflow-hidden border-b border-smoke bg-ink py-20 lg:py-24">
         <div class="pointer-events-none absolute inset-0 opacity-40">
